@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LPLl A4 Sheet Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2c2c2c;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .controls {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover { background-color: #45a049; }
+        button:disabled { background-color: #555; cursor: not-allowed; }
+
+        input[type="file"] {
+            color: #ffffff;
+        }
+
+        /* Preview Canvas on Screen */
+        canvas {
+            max-width: 100%;
+            height: auto;
+            background: white;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <input type="file" id="imageUpload" multiple accept="image/*">
+        <button id="downloadBtn" disabled>Download to Safari</button>
+    </div>
+
+    <!-- Master A4 Canvas Blueprint (1240 x 1754 Proportions) -->
+    <canvas id="sheetCanvas" width="1240" height="1754"></canvas>
+
+    <script>
+        const imageUpload = document.getElementById('imageUpload');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const canvas = document.getElementById('sheetCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let loadedImages = [];
+
+        function drawSheet() {
+            // Fill background white
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Title
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 48px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('LPLl Algorithms Cheat Sheet', canvas.width / 2, 90);
+
+            // Draw Header Underline
+            ctx.strokeStyle = '#333333';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(80, 125);
+            ctx.lineTo(canvas.width - 80, 125);
+            ctx.stroke();
+
+            if (loadedImages.length === 0) {
+                ctx.fillStyle = '#777777';
+                ctx.font = 'italic 30px Arial';
+                ctx.fillText('Upload your screenshots above to generate the A4 sheet.', canvas.width / 2, 300);
+                downloadBtn.disabled = true;
+                return;
+            }
+
+            let marginX = 80;
+            let usableWidth = canvas.width - (marginX * 2); // 1080px
+            let colWidth = usableWidth / 2; // 540px per column
+            let rowHeight = 115; // Vertical spacing per row
+            let startY = 170;
+
+            loadedImages.forEach((img, index) => {
+                let colIndex = index % 2; // 0 = Left Column, 1 = Right Column
+                let rowIndex = Math.floor(index / 2);
+
+                let currentX = marginX + (colIndex * colWidth);
+                let currentY = startY + (rowIndex * rowHeight);
+
+                // Auto-expand canvas height if too many images are added
+                if (currentY + rowHeight > canvas.height - 80) {
+                    let oldData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    canvas.height += 500;
+                    ctx.putImageData(oldData, 0, 0);
+                }
+
+                // 1. EXTRACT BOTTOM-LEFT CASE (Strict 1:1 Square Ratio, Un-squashed)
+                let cropSize = img.width * 0.15; // Equal width and height source slice
+                let cropX = img.width * 0.04;
+                let cropY = img.height * 0.74;
+                let displaySize = 80; // Perfect square box dimensions on canvas
+
+                ctx.drawImage(img, cropX, cropY, cropSize, cropSize, currentX, currentY, displaySize, displaySize);
+                
+                // Clean Border around Case Box
+                ctx.strokeStyle = '#cccccc';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(currentX, currentY, displaySize, displaySize);
+
+                // 2. EXTRACT TOP ALGORITHM (Full width, perfectly proportioned text)
+                let algX = 0;
+                let algY = 0;
+                let algW = img.width;
+                let algH = img.height * 0.22;
+
+                let algDestX = currentX + displaySize + 15;
+                let algDestW = colWidth - displaySize - 30;
+                let algDestH = 50;
+
+                ctx.drawImage(img, algX, algY, algW, algH, algDestX, currentY + 15, algDestW, algDestH);
+            });
+
+            downloadBtn.disabled = false;
+        }
+
+        imageUpload.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            loadedImages = [];
+            if (files.length === 0) {
+                drawSheet();
+                return;
+            }
+
+            let loadedCount = 0;
+            files.forEach((file, idx) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        loadedImages[idx] = img;
+                        loadedCount++;
+                        if (loadedCount === files.length) {
+                            drawSheet();
+                        }
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Trigger native Safari download via Blob URL
+        downloadBtn.addEventListener('click', () => {
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'LPLl-A4-Sheet.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 'image/png');
+        });
+
+        drawSheet();
+    </script>
+</body>
+</html>
