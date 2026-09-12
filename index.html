@@ -3,193 +3,1312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLL A4 Sheet Generator</title>
+    <title>PLL Studio Pro Ultimate - 1000+ Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #2c2c2c;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        :root {
+            --bg-darker: #090d16;
+            --bg-dark: #111827;
+            --bg-panel: #1f2937;
+            --accent: #10b981;
+            --accent-hover: #059669;
         }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-darker); }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 
-        .controls {
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        
+        .drag-ghost { opacity: 0.3; border: 2px dashed var(--accent); background: #090d16; }
+        
+        canvas { touch-action: none; user-select: none; -webkit-user-select: none; }
+        
+        input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
+        input[type="range"] { accent-color: var(--accent); }
+
+        .custom-bg-dots {
+            background-image: radial-gradient(#374151 1px, transparent 1px);
+            background-size: 24px 24px;
         }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        button:hover { background-color: #45a049; }
-        button:disabled { background-color: #555; cursor: not-allowed; }
-
-        input[type="file"] {
-            color: #ffffff;
-        }
-
-        /* Preview Canvas on Screen */
-        canvas {
-            max-width: 100%;
-            height: auto;
-            background: white;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
-            border-radius: 4px;
-        }
+        
+        .case-card { transition: all 0.2s ease-in-out; }
     </style>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-200 h-screen flex overflow-hidden selection:bg-emerald-500 selection:text-white">
 
-    <div class="controls">
-        <input type="file" id="imageUpload" multiple accept="image/*">
-        <button id="downloadBtn" disabled>Download to Safari</button>
+    <aside class="w-80 bg-slate-900 border-r border-slate-800 flex flex-col z-20 shadow-2xl relative flex-shrink-0">
+        <div class="p-5 border-b border-slate-800 bg-slate-950 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <h1 class="text-xl font-extrabold bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-500 bg-clip-text text-transparent mb-4 tracking-wide relative z-10">
+                PLL Studio Pro <span class="text-[10px] px-2 py-0.5 rounded bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-lg uppercase tracking-widest font-mono align-top ml-1">v1000+</span>
+            </h1>
+            <label class="w-full flex items-center justify-center px-4 py-3 bg-slate-800 border border-slate-700/80 rounded-xl cursor-pointer hover:bg-slate-700 hover:border-emerald-500 transition-all shadow-lg group relative z-10">
+                <svg class="w-5 h-5 mr-2 text-emerald-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                <span class="text-sm font-semibold text-white">Upload Images</span>
+                <input type="file" id="imageUpload" multiple accept="image/*" class="hidden">
+            </label>
+        </div>
+
+        <!-- Global Layout Panel -->
+        <div class="p-4 border-b border-slate-800 bg-slate-800/40">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    A4 Layout
+                </h3>
+                <div class="flex bg-slate-900 rounded p-0.5 border border-slate-700">
+                    <label class="px-2 py-0.5 text-[10px] font-bold rounded cursor-pointer transition-colors" id="lblModeGrid">
+                        <input type="radio" name="layoutMode" value="grid" checked class="hidden"> Grid
+                    </label>
+                    <label class="px-2 py-0.5 text-[10px] font-bold rounded cursor-pointer transition-colors text-slate-500" id="lblModeFree">
+                        <input type="radio" name="layoutMode" value="free" class="hidden"> Freeform
+                    </label>
+                </div>
+            </div>
+            
+            <div id="gridSettings" class="space-y-2.5 text-xs transition-opacity duration-300">
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-300">Columns:</span>
+                    <input type="number" id="gridCols" min="1" max="5" value="2" class="w-16 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white text-right font-mono focus:border-emerald-500 outline-none">
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-300">Cell Width (px):</span>
+                    <input type="number" id="gridW" min="100" max="1000" value="540" class="w-16 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white text-right font-mono focus:border-emerald-500 outline-none">
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-300">Cell Height (px):</span>
+                    <input type="number" id="gridH" min="50" max="1000" value="115" class="w-16 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white text-right font-mono focus:border-emerald-500 outline-none">
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-300">Side Margins:</span>
+                    <input type="number" id="gridMargin" min="0" max="300" value="80" class="w-16 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white text-right font-mono focus:border-emerald-500 outline-none">
+                </div>
+            </div>
+            <div id="freeformNotice" class="hidden text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 p-2 rounded leading-relaxed">
+                Freeform Mode Active. Drag cases anywhere on the A4 Preview to arrange them freely.
+            </div>
+        </div>
+
+        <div class="p-3 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Cases (<span id="caseCount">0</span>)</span>
+            <div class="space-x-1">
+                <button id="btnGroupAll" class="text-xs px-2 py-1 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/30 rounded text-indigo-300 transition" title="Group Selected Boxes">🔗 Group Block</button>
+            </div>
+        </div>
+
+        <!-- Case Thumbnails List -->
+        <div class="flex-1 overflow-y-auto p-2 space-y-2" id="thumbList">
+            <div class="text-center text-slate-500 text-sm mt-12 p-4">No cases uploaded yet.<br>Upload images to begin.</div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col relative bg-slate-950 min-w-0">
+        <!-- Top Toolbar -->
+        <header class="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 z-10 flex-shrink-0 shadow-md">
+            <div class="flex space-x-2 bg-slate-950 p-1 rounded-xl border border-slate-800 shadow-inner">
+                <button id="tabPreview" class="px-5 py-1.5 text-sm font-bold rounded-lg bg-emerald-600 text-white shadow-lg transition-all">A4 Preview</button>
+                <button id="tabEdit" class="px-5 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all flex items-center">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    Advanced Studio
+                </button>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex flex-col">
+                    <label class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5 font-bold">Sheet Title</label>
+                    <input type="text" id="sheetTitle" value="PLL Algorithms Cheat Sheet" class="bg-slate-950 border border-slate-700 text-sm font-semibold rounded px-3 py-1.5 w-64 focus:border-emerald-500 focus:outline-none transition shadow-inner">
+                </div>
+                <button id="btnDownload" disabled class="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Export HD PNG
+                </button>
+            </div>
+        </header>
+
+        <!-- Preview View -->
+        <div id="viewPreview" class="flex-1 overflow-auto p-8 flex justify-center items-start bg-slate-950 custom-bg-dots relative">
+            <canvas id="masterCanvas" width="1240" height="1754" class="bg-white shadow-2xl origin-top rounded-sm cursor-grab active:cursor-grabbing" style="max-width: 100%; height: auto; transition: transform 0.1s;"></canvas>
+            
+            <!-- Zoom Controls -->
+            <div class="fixed bottom-6 right-6 flex bg-slate-900 border border-slate-700 rounded-lg overflow-hidden shadow-xl z-50">
+                <button id="btnZoomOut" class="p-2 hover:bg-slate-800 text-slate-300 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg></button>
+                <div class="px-3 py-2 text-xs font-mono font-bold flex items-center bg-slate-950 text-emerald-400" id="zoomLevel">100%</div>
+                <button id="btnZoomIn" class="p-2 hover:bg-slate-800 text-slate-300 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path></svg></button>
+            </div>
+        </div>
+
+        <div id="viewEdit" class="flex-1 flex hidden overflow-hidden">
+            <!-- Left: 8-Handle Cropper & Annotations -->
+            <div class="flex-1 flex flex-col border-r border-slate-800 bg-slate-950 min-w-0">
+                <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center z-10 shadow-sm">
+                    <div class="flex items-center space-x-4">
+                        <div>
+                            <h2 class="text-sm font-bold text-slate-200">1. Source & Annotate</h2>
+                            <p class="text-[10px] text-slate-500 mt-0.5">Crop image regions or draw arrows & guides.</p>
+                        </div>
+                        <!-- Annotation Mode Tools -->
+                        <div class="flex bg-slate-950 p-1 rounded-lg border border-slate-800 space-x-1 items-center h-10">
+                            <button id="toolCrop" class="px-3 py-1.5 text-xs font-bold rounded bg-emerald-600 text-white transition flex items-center" title="Crop Mode">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg> Crop
+                            </button>
+                            <div class="w-px h-6 bg-slate-800 mx-1"></div>
+                            <button id="toolDraw" class="px-3 py-1.5 text-xs font-semibold rounded text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center" title="Freehand Draw">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg> Draw
+                            </button>
+                            <button id="toolArrow" class="px-3 py-1.5 text-xs font-semibold rounded text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center" title="Draw Arrow">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg> Arrow
+                            </button>
+                            
+                            <!-- Drawing specific options -->
+                            <div id="drawOptions" class="hidden flex items-center pl-2 ml-1 border-l border-slate-800 space-x-2">
+                                <input type="color" id="drawColor" value="#ef4444" class="w-6 h-6 rounded cursor-pointer bg-slate-950 border-0 p-0">
+                                <input type="range" id="drawSize" min="1" max="15" value="4" class="w-20">
+                                <button id="btnUndoDraw" class="text-xs text-slate-400 hover:text-rose-400 transition" title="Undo Last Drawing"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1 p-6 flex justify-center items-center relative overflow-hidden bg-black/60 custom-bg-dots" id="cropContainer">
+                    <canvas id="cropCanvas" class="shadow-2xl border border-slate-700/80 rounded-sm max-w-full max-h-full object-contain"></canvas>
+                </div>
+            </div>
+
+            <!-- Right: Composer, Groups & Properties -->
+            <div class="w-[520px] flex flex-col bg-slate-900 flex-shrink-0 z-10 shadow-[-10px_0_30px_rgba(0,0,0,0.4)]">
+                <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center shadow-sm">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-200">2. Cell Composer</h2>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Design the internal layout of the case block.</p>
+                    </div>
+                    <div class="flex space-x-1">
+                        <button id="btnAddCropBox" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 px-2 py-1.5 rounded text-emerald-400 flex items-center font-bold shadow-sm transition-colors" title="Add Image Box">
+                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> + Crop
+                        </button>
+                        <button id="btnAddTextBox" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 px-2 py-1.5 rounded text-blue-400 flex items-center font-bold shadow-sm transition-colors" title="Add Text Box">
+                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg> + Text
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Cell Canvas Container -->
+                <div class="p-6 flex justify-center items-center bg-slate-950 border-b border-slate-800 min-h-[260px] relative">
+                    <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(45deg, #64748b 25%, transparent 25%), linear-gradient(-45deg, #64748b 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #64748b 75%), linear-gradient(-45deg, transparent 75%, #64748b 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;"></div>
+                    <canvas id="composeCanvas" class="bg-white shadow-2xl rounded-sm border-2 border-slate-700 cursor-crosshair z-10 w-full" style="image-rendering: pixelated;"></canvas>
+                </div>
+
+                <!-- Properties / Actions Panel -->
+                <div class="flex-1 p-5 overflow-y-auto flex flex-col space-y-4 bg-slate-900">
+                    <div id="boxProperties" class="bg-slate-950 border border-slate-800 rounded-xl p-5 text-center text-slate-500 text-sm shadow-inner min-h-[200px]">
+                        Click on any block or box in the canvases to edit its coordinates, size, or styling properties.
+                    </div>
+
+                    <div class="mt-auto pt-4 border-t border-slate-800">
+                        <button id="btnBatchModal" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold rounded-xl shadow-lg shadow-indigo-900/30 flex justify-center items-center transition-all group">
+                            <svg class="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            Apply Template To Other Cases...
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="batchModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center opacity-0 transition-opacity duration-200">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-[500px] flex flex-col max-h-[85vh] transform scale-95 transition-transform duration-200" id="batchModalInner">
+            <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
+                <h3 class="text-lg font-bold text-white flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                    Batch Apply Template
+                </h3>
+                <button id="btnCloseModal" class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-700 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-4 bg-slate-950 flex justify-between items-center border-b border-slate-800">
+                <span class="text-sm font-medium text-slate-300">Select target cases to overwrite layout:</span>
+                <div class="space-x-2">
+                    <button id="btnSelectAll" class="text-xs bg-slate-800 border border-slate-700 hover:bg-slate-700 px-3 py-1.5 rounded text-white font-medium transition-colors">Select All</button>
+                    <button id="btnSelectNone" class="text-xs bg-slate-800 border border-slate-700 hover:bg-slate-700 px-3 py-1.5 rounded text-white font-medium transition-colors">None</button>
+                </div>
+            </div>
+            <div id="modalList" class="flex-1 overflow-y-auto p-4 space-y-2 bg-slate-900 custom-bg-dots"></div>
+            <div class="p-5 border-t border-slate-800 bg-slate-950 rounded-b-2xl">
+                <button id="btnConfirmBatch" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition-all">
+                    Confirm & Apply Settings
+                </button>
+            </div>
+        </div>
     </div>
 
-    <!-- Master A4 Canvas Blueprint (1240 x 1754 Proportions) -->
-    <canvas id="sheetCanvas" width="1240" height="1754"></canvas>
-
     <script>
+        // --- Core Data Structures ---
+        let cases = [];
+        let activeIdx = null; 
+        let activeTab = 'preview'; // 'preview' | 'edit'
+        let selectedBoxId = null;
+        
+        // Mode & Tool State
+        let annotationTool = 'crop'; // 'crop' | 'draw' | 'arrow'
+        let drawState = { isDrawing: false, points: [] };
+        let zoomVal = 1.0;
+
+        // Global A4 Settings
+        const globalA4 = {
+            mode: 'grid', // 'grid' | 'free'
+            pageW: 1240,
+            startY: 190,
+            cols: 2,
+            cellW: 540,
+            cellH: 115,
+            marginX: 80
+        };
+
+        const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#ef4444', '#06b6d4', '#14b8a6'];
+        let colorCounter = 0;
+
+        // --- DOM Elements ---
         const imageUpload = document.getElementById('imageUpload');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const canvas = document.getElementById('sheetCanvas');
-        const ctx = canvas.getContext('2d');
+        const thumbList = document.getElementById('thumbList');
+        const caseCount = document.getElementById('caseCount');
+        const btnGroupAll = document.getElementById('btnGroupAll');
+        
+        // Views & Tabs
+        const tabPreview = document.getElementById('tabPreview');
+        const tabEdit = document.getElementById('tabEdit');
+        const viewPreview = document.getElementById('viewPreview');
+        const viewEdit = document.getElementById('viewEdit');
+        
+        // Canvases
+        const masterCanvas = document.getElementById('masterCanvas');
+        const mCtx = masterCanvas.getContext('2d');
+        const cropCanvas = document.getElementById('cropCanvas');
+        const crCtx = cropCanvas.getContext('2d');
+        const composeCanvas = document.getElementById('composeCanvas');
+        const cmCtx = composeCanvas.getContext('2d');
+        
+        // Toolbar & Options
+        const sheetTitle = document.getElementById('sheetTitle');
+        const btnDownload = document.getElementById('btnDownload');
+        const btnAddCropBox = document.getElementById('btnAddCropBox');
+        const btnAddTextBox = document.getElementById('btnAddTextBox');
+        const boxProperties = document.getElementById('boxProperties');
 
-        let loadedImages = [];
+        // Layout Mode
+        const radioGrid = document.querySelector('input[value="grid"]');
+        const radioFree = document.querySelector('input[value="free"]');
+        const lblGrid = document.getElementById('lblModeGrid');
+        const lblFree = document.getElementById('lblModeFree');
+        const gridSettings = document.getElementById('gridSettings');
+        const freeformNotice = document.getElementById('freeformNotice');
 
-        function drawSheet() {
-            // Fill background white
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Zoom
+        const btnZoomIn = document.getElementById('btnZoomIn');
+        const btnZoomOut = document.getElementById('btnZoomOut');
+        const zoomLevel = document.getElementById('zoomLevel');
 
-            // Draw Title
-            ctx.fillStyle = '#000000';
-            ctx.font = 'bold 48px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('LPLl Algorithms Cheat Sheet', canvas.width / 2, 90);
+        // Batch Modal
+        const batchModal = document.getElementById('batchModal');
+        const batchModalInner = document.getElementById('batchModalInner');
+        const modalList = document.getElementById('modalList');
+        const btnCloseModal = document.getElementById('btnCloseModal');
+        const btnSelectAll = document.getElementById('btnSelectAll');
+        const btnSelectNone = document.getElementById('btnSelectNone');
+        const btnConfirmBatch = document.getElementById('btnConfirmBatch');
+        const btnBatchModal = document.getElementById('btnBatchModal');
 
-            // Draw Header Underline
-            ctx.strokeStyle = '#333333';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(80, 125);
-            ctx.lineTo(canvas.width - 80, 125);
-            ctx.stroke();
+        // Annotation Tools
+        const toolCrop = document.getElementById('toolCrop');
+        const toolDraw = document.getElementById('toolDraw');
+        const toolArrow = document.getElementById('toolArrow');
+        const drawOptions = document.getElementById('drawOptions');
+        const drawColor = document.getElementById('drawColor');
+        const drawSize = document.getElementById('drawSize');
+        const btnUndoDraw = document.getElementById('btnUndoDraw');
 
-            if (loadedImages.length === 0) {
-                ctx.fillStyle = '#777777';
-                ctx.font = 'italic 30px Arial';
-                ctx.fillText('Upload your screenshots above to generate the A4 sheet.', canvas.width / 2, 300);
-                downloadBtn.disabled = true;
-                return;
+        // Grid Inputs
+        const inCols = document.getElementById('gridCols');
+        const inW = document.getElementById('gridW');
+        const inH = document.getElementById('gridH');
+        const inMargin = document.getElementById('gridMargin');
+
+        function generateId() { return Date.now().toString(36) + Math.random().toString(36).substring(2); }
+
+        function updateGlobals() {
+            globalA4.cols = parseInt(inCols.value) || 2;
+            globalA4.cellW = parseInt(inW.value) || 540;
+            globalA4.cellH = parseInt(inH.value) || 115;
+            globalA4.marginX = parseInt(inMargin.value) || 80;
+            
+            composeCanvas.width = globalA4.cellW;
+            composeCanvas.height = globalA4.cellH;
+            
+            drawA4();
+            if (activeTab === 'edit') renderEditors();
+        }
+
+        [inCols, inW, inH, inMargin].forEach(el => el.addEventListener('change', updateGlobals));
+
+        radioGrid.addEventListener('change', syncLayoutMode);
+        radioFree.addEventListener('change', syncLayoutMode);
+
+        function syncLayoutMode() {
+            globalA4.mode = radioGrid.checked ? 'grid' : 'free';
+            if(globalA4.mode === 'grid') {
+                lblGrid.className = 'px-2 py-1 text-[10px] font-bold rounded cursor-pointer transition-colors bg-emerald-600 text-white';
+                lblFree.className = 'px-2 py-1 text-[10px] font-bold rounded cursor-pointer transition-colors text-slate-400 hover:text-white';
+                gridSettings.classList.remove('opacity-30', 'pointer-events-none');
+                freeformNotice.classList.add('hidden');
+            } else {
+                lblFree.className = 'px-2 py-1 text-[10px] font-bold rounded cursor-pointer transition-colors bg-blue-600 text-white';
+                lblGrid.className = 'px-2 py-1 text-[10px] font-bold rounded cursor-pointer transition-colors text-slate-400 hover:text-white';
+                gridSettings.classList.add('opacity-30', 'pointer-events-none');
+                freeformNotice.classList.remove('hidden');
+                initFreeformPositions();
             }
+            drawA4();
+        }
 
-            let marginX = 80;
-            let usableWidth = canvas.width - (marginX * 2); // 1080px
-            let colWidth = usableWidth / 2; // 540px per column
-            let rowHeight = 115; // Vertical spacing per row
-            let startY = 170;
+        // Initialize freeform positions from current grid math so things don't jump to 0,0
+        function initFreeformPositions() {
+            const activeCases = cases.filter(c => c.enabled);
+            let usableWidth = globalA4.pageW - (globalA4.marginX * 2);
+            let colWidth = usableWidth / globalA4.cols; 
 
-            loadedImages.forEach((img, index) => {
-                let colIndex = index % 2; // 0 = Left Column, 1 = Right Column
-                let rowIndex = Math.floor(index / 2);
-
-                let currentX = marginX + (colIndex * colWidth);
-                let currentY = startY + (rowIndex * rowHeight);
-
-                // Auto-expand canvas height if too many images are added
-                if (currentY + rowHeight > canvas.height - 80) {
-                    let oldData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    canvas.height += 500;
-                    ctx.putImageData(oldData, 0, 0);
+            activeCases.forEach((c, index) => {
+                if (c.a4x === undefined || c.a4y === undefined) {
+                    let colIdx = index % globalA4.cols;
+                    let rowIdx = Math.floor(index / globalA4.cols);
+                    c.a4x = globalA4.marginX + (colIdx * colWidth);
+                    c.a4y = globalA4.startY + (rowIdx * globalA4.cellH);
                 }
-
-                // 1. EXTRACT BOTTOM-LEFT CASE (Strict 1:1 Square Ratio, Un-squashed)
-                let cropSize = img.width * 0.15; // Equal width and height source slice
-                let cropX = img.width * 0.04;
-                let cropY = img.height * 0.74;
-                let displaySize = 80; // Perfect square box dimensions on canvas
-
-                ctx.drawImage(img, cropX, cropY, cropSize, cropSize, currentX, currentY, displaySize, displaySize);
-                
-                // Clean Border around Case Box
-                ctx.strokeStyle = '#cccccc';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(currentX, currentY, displaySize, displaySize);
-
-                // 2. EXTRACT TOP ALGORITHM (Full width, perfectly proportioned text)
-                let algX = 0;
-                let algY = 0;
-                let algW = img.width;
-                let algH = img.height * 0.22;
-
-                let algDestX = currentX + displaySize + 15;
-                let algDestW = colWidth - displaySize - 30;
-                let algDestH = 50;
-
-                ctx.drawImage(img, algX, algY, algW, algH, algDestX, currentY + 15, algDestW, algDestH);
             });
+        }
 
-            downloadBtn.disabled = false;
+        function createDefaultBoxes() {
+            return [
+                {
+                    id: generateId(), type: 'crop', color: COLORS[0], label: 'Image Box',
+                    cx: 0.04, cy: 0.74, cw: 0.15, ch: 0.15, 
+                    ox: 12, oy: 15, ow: 85, oh: 85,
+                    groupId: null, enabled: true
+                },
+                {
+                    id: generateId(), type: 'text', color: '#cbd5e1', label: 'Algorithm Text',
+                    text: "R U R' U'", fontSize: 24, fontColor: '#1e293b', align: 'left',
+                    ox: 108, oy: 35, ow: 415, oh: 50,
+                    groupId: null, enabled: true
+                }
+            ];
         }
 
         imageUpload.addEventListener('change', (e) => {
             const files = Array.from(e.target.files);
-            loadedImages = [];
-            if (files.length === 0) {
-                drawSheet();
-                return;
-            }
+            if (!files.length) return;
 
-            let loadedCount = 0;
-            files.forEach((file, idx) => {
+            composeCanvas.width = globalA4.cellW;
+            composeCanvas.height = globalA4.cellH;
+
+            let loaded = 0;
+            files.forEach((file) => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const img = new Image();
                     img.onload = () => {
-                        loadedImages[idx] = img;
-                        loadedCount++;
-                        if (loadedCount === files.length) {
-                            drawSheet();
+                        let cleanName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                        cleanName = cleanName.replace(/[_]/g, ' ').toUpperCase();
+
+                        const newCase = {
+                            id: generateId(),
+                            name: cleanName,
+                            img: img,
+                            enabled: true,
+                            boxes: createDefaultBoxes(),
+                            annotations: [],
+                            compositeCanvas: null
+                        };
+                        cases.push(newCase);
+                        updateCaseComposite(newCase); // Create initial composite
+                        
+                        loaded++;
+                        if (loaded === files.length) {
+                            if (activeIdx === null) activeIdx = 0;
+                            if (globalA4.mode === 'free') initFreeformPositions();
+                            renderSidebar(); drawA4();
+                            if (activeTab === 'edit') renderEditors();
                         }
                     };
                     img.src = event.target.result;
                 };
                 reader.readAsDataURL(file);
             });
+            imageUpload.value = '';
         });
 
-        // Trigger native Safari download via Blob URL
-        downloadBtn.addEventListener('click', () => {
-            canvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'LPLl-A4-Sheet.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 'image/png');
+        // Regenerate the composite offscreen canvas whenever image or annotations change
+        function updateCaseComposite(c) {
+            if (!c.compositeCanvas) {
+                c.compositeCanvas = document.createElement('canvas');
+            }
+            const ctx = c.compositeCanvas.getContext('2d');
+            c.compositeCanvas.width = c.img.width;
+            c.compositeCanvas.height = c.img.height;
+
+            // Draw base image
+            ctx.drawImage(c.img, 0, 0);
+
+            // Draw all annotations
+            c.annotations.forEach(ann => {
+                ctx.strokeStyle = ann.color;
+                ctx.fillStyle = ann.color;
+                ctx.lineWidth = ann.width || 3;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                if (ann.type === 'draw' && ann.points.length > 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(ann.points[0].x * c.img.width, ann.points[0].y * c.img.height);
+                    for (let i = 1; i < ann.points.length; i++) {
+                        ctx.lineTo(ann.points[i].x * c.img.width, ann.points[i].y * c.img.height);
+                    }
+                    ctx.stroke();
+                } else if (ann.type === 'arrow' && ann.points.length === 2) {
+                    const p1 = { x: ann.points[0].x * c.img.width, y: ann.points[0].y * c.img.height };
+                    const p2 = { x: ann.points[1].x * c.img.width, y: ann.points[1].y * c.img.height };
+                    drawArrowPath(ctx, p1.x, p1.y, p2.x, p2.y, ann.width || 3);
+                }
+            });
+        }
+
+        function drawArrowPath(ctx, fromx, fromy, tox, toy, lw) {
+            const headlen = lw * 4;
+            const dx = tox - fromx;
+            const dy = toy - fromy;
+            const angle = Math.atan2(dy, dx);
+            ctx.beginPath();
+            ctx.moveTo(fromx, fromy);
+            ctx.lineTo(tox, toy);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(tox, toy);
+            ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(tox, toy);
+            ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.stroke();
+        }
+
+        let dragSourceIdx = null;
+
+        function renderSidebar() {
+            caseCount.innerText = cases.length;
+            thumbList.innerHTML = '';
+            
+            if (!cases.length) {
+                thumbList.innerHTML = '<div class="text-center text-slate-500 text-sm mt-12 p-4 border border-dashed border-slate-800 rounded-xl">No cases uploaded.<br>Upload images above.</div>';
+                btnDownload.disabled = true;
+                return;
+            }
+            btnDownload.disabled = false;
+
+            cases.forEach((c, idx) => {
+                const el = document.createElement('div');
+                el.className = `case-card flex flex-col p-2.5 rounded-xl border shadow-sm ${idx === activeIdx ? 'border-emerald-500 bg-slate-800/90 shadow-[0_0_15px_rgba(16,185,129,0.15)]' : 'border-slate-800/80 bg-slate-900 hover:bg-slate-800 hover:border-slate-700'}`;
+                
+                // Top Row (Drag, Thumb, Info)
+                const topRow = document.createElement('div');
+                topRow.className = 'flex items-center w-full';
+
+                const dragger = document.createElement('div');
+                dragger.className = 'cursor-grab active:cursor-grabbing px-1 text-slate-500 hover:text-white flex items-center justify-center';
+                dragger.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>';
+                dragger.draggable = true;
+                
+                dragger.addEventListener('dragstart', (e) => { dragSourceIdx = idx; e.dataTransfer.effectAllowed = 'move'; setTimeout(() => el.classList.add('drag-ghost'), 0); });
+                dragger.addEventListener('dragend', () => el.classList.remove('drag-ghost'));
+                el.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+                el.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    if (dragSourceIdx !== null && dragSourceIdx !== idx) {
+                        const item = cases.splice(dragSourceIdx, 1)[0];
+                        cases.splice(idx, 0, item);
+                        if (activeIdx === dragSourceIdx) activeIdx = idx; else if (activeIdx === idx) activeIdx = dragSourceIdx;
+                        renderSidebar(); drawA4();
+                    }
+                });
+
+                const thumbC = document.createElement('canvas');
+                thumbC.width = 40; thumbC.height = 40;
+                thumbC.className = 'rounded object-cover flex-shrink-0 border border-slate-700 bg-slate-950 shadow-sm ml-2 cursor-pointer';
+                thumbC.getContext('2d').drawImage(c.compositeCanvas, 0, 0, 40, 40);
+                thumbC.addEventListener('click', () => selectCase(idx));
+
+                const info = document.createElement('div');
+                info.className = 'flex flex-col ml-3 flex-1 overflow-hidden';
+                
+                const titleRow = document.createElement('div');
+                titleRow.className = 'flex justify-between items-center w-full';
+                
+                const nameSpan = document.createElement('input');
+                nameSpan.type = 'text';
+                nameSpan.value = c.name;
+                nameSpan.className = 'text-sm font-semibold truncate text-slate-200 bg-transparent border-b border-transparent hover:border-slate-600 focus:border-emerald-500 outline-none w-full mr-2 transition-colors';
+                nameSpan.addEventListener('change', () => { c.name = nameSpan.value.trim() || 'CASE'; drawA4(); });
+                nameSpan.addEventListener('focus', () => selectCase(idx));
+
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.checked = c.enabled;
+                cb.className = 'w-4 h-4 rounded border-slate-700 cursor-pointer flex-shrink-0 mt-1';
+                cb.title = "Toggle Visibility on Sheet";
+                cb.addEventListener('change', () => { c.enabled = cb.checked; drawA4(); });
+
+                titleRow.appendChild(nameSpan);
+                titleRow.appendChild(cb);
+                info.appendChild(titleRow);
+
+                // Actions Row (Move up/down, delete)
+                const actionsRow = document.createElement('div');
+                actionsRow.className = 'flex justify-between items-center mt-2 pt-2 border-t border-slate-800/50';
+                
+                const moveGrp = document.createElement('div');
+                moveGrp.className = 'flex space-x-1';
+                
+                const btnUp = document.createElement('button');
+                btnUp.innerHTML = '▲'; btnUp.className = 'text-[10px] w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition';
+                btnUp.disabled = idx === 0; if(idx===0) btnUp.classList.add('opacity-30', 'cursor-not-allowed');
+                btnUp.onclick = () => { swapCases(idx, idx-1); };
+
+                const btnDn = document.createElement('button');
+                btnDn.innerHTML = '▼'; btnDn.className = 'text-[10px] w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition';
+                btnDn.disabled = idx === cases.length-1; if(idx === cases.length-1) btnDn.classList.add('opacity-30', 'cursor-not-allowed');
+                btnDn.onclick = () => { swapCases(idx, idx+1); };
+
+                const btnDel = document.createElement('button');
+                btnDel.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+                btnDel.className = 'text-xs w-6 h-6 flex justify-center items-center rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition';
+                btnDel.onclick = () => { if(confirm('Delete case?')) { cases.splice(idx, 1); if(activeIdx === idx) activeIdx = cases.length > 0 ? 0 : null; else if (activeIdx > idx) activeIdx--; renderSidebar(); drawA4(); if(activeTab==='edit') renderEditors(); } };
+
+                moveGrp.appendChild(btnUp); moveGrp.appendChild(btnDn);
+                actionsRow.appendChild(moveGrp);
+                actionsRow.appendChild(btnDel);
+
+                topRow.appendChild(dragger);
+                topRow.appendChild(thumbC);
+                topRow.appendChild(info);
+                
+                el.appendChild(topRow);
+                if(idx === activeIdx) el.appendChild(actionsRow); // Only show controls for active card to save space
+
+                thumbList.appendChild(el);
+            });
+        }
+
+        function selectCase(idx) {
+            activeIdx = idx;
+            selectedBoxId = null;
+            renderSidebar();
+            if (activeTab === 'preview') switchTab('edit');
+            else renderEditors();
+        }
+
+        function swapCases(i, j) {
+            if (i < 0 || j < 0 || i >= cases.length || j >= cases.length) return;
+            const temp = cases[i];
+            cases[i] = cases[j];
+            cases[j] = temp;
+            if (activeIdx === i) activeIdx = j;
+            else if (activeIdx === j) activeIdx = i;
+            renderSidebar();
+            drawA4();
+        }
+
+        sheetTitle.addEventListener('input', drawA4);
+
+        function drawA4() {
+            if (activeTab !== 'preview' && document.hidden !== undefined) return;
+            
+            masterCanvas.width = globalA4.pageW;
+            const activeCases = cases.filter(c => c.enabled);
+            
+            let requiredHeight = 1754; // Min A4 height
+            if (globalA4.mode === 'grid') {
+                let numRows = Math.ceil(activeCases.length / globalA4.cols);
+                requiredHeight = Math.max(1754, globalA4.startY + (numRows * globalA4.cellH) + 120);
+            } else {
+                // Find bounds in freeform
+                let maxY = globalA4.startY;
+                activeCases.forEach(c => { if(c.a4y + globalA4.cellH > maxY) maxY = c.a4y + globalA4.cellH; });
+                requiredHeight = Math.max(1754, maxY + 120);
+            }
+            masterCanvas.height = requiredHeight;
+
+            // Sheet Background
+            mCtx.fillStyle = '#ffffff';
+            mCtx.fillRect(0, 0, masterCanvas.width, masterCanvas.height);
+
+            // Title
+            mCtx.fillStyle = '#0f172a';
+            mCtx.font = 'bold 48px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+            mCtx.textAlign = 'center';
+            mCtx.fillText(sheetTitle.value || 'PLL Sheet', masterCanvas.width / 2, 95);
+
+            mCtx.strokeStyle = '#cbd5e1';
+            mCtx.lineWidth = 3;
+            mCtx.beginPath(); mCtx.moveTo(globalA4.marginX, 135); mCtx.lineTo(masterCanvas.width - globalA4.marginX, 135); mCtx.stroke();
+
+            if (!activeCases.length) {
+                mCtx.fillStyle = '#94a3b8'; mCtx.font = 'italic 24px Arial'; mCtx.fillText('No active cases to display.', masterCanvas.width / 2, 350); return;
+            }
+
+            let usableWidth = masterCanvas.width - (globalA4.marginX * 2);
+            let colWidth = usableWidth / globalA4.cols; 
+
+            activeCases.forEach((item, index) => {
+                let currentX = item.a4x || 0;
+                let currentY = item.a4y || 0;
+
+                if (globalA4.mode === 'grid') {
+                    let colIdx = index % globalA4.cols;
+                    let rowIdx = Math.floor(index / globalA4.cols);
+                    currentX = globalA4.marginX + (colIdx * colWidth);
+                    currentY = globalA4.startY + (rowIdx * globalA4.cellH);
+                }
+
+                // Draw Case Title above cell
+                mCtx.fillStyle = '#1e293b';
+                mCtx.font = 'bold 15px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+                mCtx.textAlign = 'left';
+                mCtx.fillText(item.name || 'CASE', currentX + 5, currentY - 8);
+
+                // Draw Cell Boundary slightly in edit mode (preview only)
+                if (globalA4.mode === 'free') {
+                    mCtx.strokeStyle = 'rgba(0,0,0,0.05)';
+                    mCtx.lineWidth = 1;
+                    mCtx.setLineDash([5,5]);
+                    mCtx.strokeRect(currentX, currentY, globalA4.cellW, globalA4.cellH);
+                    mCtx.setLineDash([]);
+                }
+
+                // Draw each enabled Box
+                item.boxes.filter(b => b.enabled).forEach(box => {
+                    const dx = currentX + box.ox;
+                    const dy = currentY + box.oy;
+                    const dw = box.ow;
+                    const dh = box.oh;
+
+                    if (box.type === 'crop') {
+                        const sx = box.cx * item.compositeCanvas.width;
+                        const sy = box.cy * item.compositeCanvas.height;
+                        const sw = box.cw * item.compositeCanvas.width;
+                        const sh = box.ch * item.compositeCanvas.height;
+                        try { mCtx.drawImage(item.compositeCanvas, sx, sy, sw, sh, dx, dy, dw, dh); } catch(e) {}
+                    } 
+                    else if (box.type === 'text') {
+                        mCtx.fillStyle = box.fontColor || '#000000';
+                        mCtx.font = `bold ${box.fontSize || 24}px -apple-system, BlinkMacSystemFont, Arial, sans-serif`;
+                        mCtx.textAlign = box.align || 'left';
+                        mCtx.textBaseline = 'middle';
+                        
+                        let tx = dx;
+                        if (box.align === 'center') tx = dx + dw/2;
+                        if (box.align === 'right') tx = dx + dw;
+                        
+                        // Clip region so text doesn't overflow wildly
+                        mCtx.save();
+                        mCtx.beginPath(); mCtx.rect(dx, dy, dw, dh); mCtx.clip();
+                        mCtx.fillText(box.text || '', tx, dy + dh/2);
+                        mCtx.restore();
+                    }
+                    
+                    // Subtle border for the box
+                    mCtx.strokeStyle = 'rgba(0,0,0,0.1)';
+                    mCtx.lineWidth = 1;
+                    mCtx.strokeRect(dx, dy, dw, dh);
+                });
+            });
+        }
+
+        function switchTab(tab) {
+            activeTab = tab;
+            if (tab === 'preview') {
+                tabPreview.className = 'px-5 py-1.5 text-sm font-bold rounded-lg bg-emerald-600 text-white shadow-lg transition-all';
+                tabEdit.className = 'px-5 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all flex items-center';
+                tabEdit.innerHTML = '<svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> Advanced Studio';
+                viewPreview.classList.remove('hidden'); viewEdit.classList.add('hidden');
+                drawA4();
+                renderSidebar(); // update sidebar action buttons visibility
+            } else {
+                tabEdit.className = 'px-5 py-1.5 text-sm font-bold rounded-lg bg-emerald-600 text-white shadow-lg transition-all flex items-center';
+                tabEdit.innerHTML = '<svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> Advanced Studio';
+                tabPreview.className = 'px-5 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all';
+                viewEdit.classList.remove('hidden'); viewPreview.classList.add('hidden');
+                renderEditors();
+                renderSidebar();
+            }
+        }
+        
+        tabPreview.addEventListener('click', () => switchTab('preview'));
+        tabEdit.addEventListener('click', () => { if(cases.length) switchTab('edit'); });
+
+        function setAnnotationTool(t) {
+            annotationTool = t;
+            const inactiveClass = 'px-3 py-1.5 text-xs font-semibold rounded text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center';
+            const activeClass = 'px-3 py-1.5 text-xs font-bold rounded bg-emerald-600 text-white transition flex items-center shadow-md';
+            
+            toolCrop.className = inactiveClass; toolDraw.className = inactiveClass; toolArrow.className = inactiveClass;
+            if(t==='crop') toolCrop.className = activeClass;
+            if(t==='draw') toolDraw.className = activeClass;
+            if(t==='arrow') toolArrow.className = activeClass;
+
+            if(t === 'draw' || t === 'arrow') {
+                drawOptions.classList.remove('hidden');
+                cropCanvas.style.cursor = 'crosshair';
+            } else {
+                drawOptions.classList.add('hidden');
+                cropCanvas.style.cursor = 'default';
+            }
+        }
+        
+        toolCrop.addEventListener('click', () => setAnnotationTool('crop'));
+        toolDraw.addEventListener('click', () => setAnnotationTool('draw'));
+        toolArrow.addEventListener('click', () => setAnnotationTool('arrow'));
+
+        btnUndoDraw.addEventListener('click', () => {
+            if (activeIdx === null) return;
+            const c = cases[activeIdx];
+            if(c.annotations.length > 0) {
+                c.annotations.pop();
+                updateCaseComposite(c);
+                renderEditors();
+                renderSidebar();
+            }
         });
 
-        drawSheet();
+        function renderEditors() {
+            if (activeIdx === null || !cases[activeIdx]) return;
+            const c = cases[activeIdx];
+            
+            // Sizing Crop Canvas perfectly to aspect ratio
+            const container = document.getElementById('cropContainer');
+            const cw = container.clientWidth - 40;
+            const ch = container.clientHeight - 40;
+            const imgRatio = c.img.width / c.img.height;
+            const conRatio = cw / ch;
+
+            if (imgRatio > conRatio) { cropCanvas.width = cw; cropCanvas.height = cw / imgRatio; }
+            else { cropCanvas.height = ch; cropCanvas.width = ch * imgRatio; }
+
+            drawCropper();
+            drawComposer();
+            updatePropertiesPanel();
+        }
+
+        function drawCropper() {
+            const c = cases[activeIdx];
+            
+            // Draw Composite
+            crCtx.drawImage(c.compositeCanvas, 0, 0, cropCanvas.width, cropCanvas.height);
+            
+            // If currently drawing something active (like drag-drawing an arrow), draw it overlayed
+            if (drawState.isDrawing && drawState.points.length > 0) {
+                crCtx.strokeStyle = drawColor.value;
+                crCtx.lineWidth = drawSize.value;
+                crCtx.lineCap = 'round'; crCtx.lineJoin = 'round';
+                
+                if (annotationTool === 'draw') {
+                    crCtx.beginPath();
+                    crCtx.moveTo(drawState.points[0].x * cropCanvas.width, drawState.points[0].y * cropCanvas.height);
+                    for (let i=1; i<drawState.points.length; i++) crCtx.lineTo(drawState.points[i].x * cropCanvas.width, drawState.points[i].y * cropCanvas.height);
+                    crCtx.stroke();
+                } else if (annotationTool === 'arrow' && drawState.points.length === 2) {
+                    const p1 = { x: drawState.points[0].x * cropCanvas.width, y: drawState.points[0].y * cropCanvas.height };
+                    const p2 = { x: drawState.points[1].x * cropCanvas.width, y: drawState.points[1].y * cropCanvas.height };
+                    drawArrowPath(crCtx, p1.x, p1.y, p2.x, p2.y, drawSize.value);
+                }
+            }
+
+            // Dark overlay logic for crop mode only
+            if (annotationTool === 'crop') {
+                crCtx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+                crCtx.fillRect(0, 0, cropCanvas.width, cropCanvas.height);
+
+                c.boxes.forEach(box => {
+                    if (!box.enabled || box.type !== 'crop') return;
+                    
+                    const rx = box.cx * cropCanvas.width;
+                    const ry = box.cy * cropCanvas.height;
+                    const rw = box.cw * cropCanvas.width;
+                    const rh = box.ch * cropCanvas.height;
+
+                    crCtx.save(); crCtx.beginPath(); crCtx.rect(rx, ry, rw, rh); crCtx.clip();
+                    crCtx.drawImage(c.compositeCanvas, 0, 0, cropCanvas.width, cropCanvas.height); 
+                    crCtx.restore();
+
+                    const isSelected = box.id === selectedBoxId;
+                    crCtx.strokeStyle = box.color; 
+                    crCtx.lineWidth = isSelected ? 3 : 1;
+                    crCtx.setLineDash(isSelected ? [] : [4, 4]);
+                    crCtx.strokeRect(rx, ry, rw, rh);
+                    crCtx.setLineDash([]);
+
+                    if (isSelected) {
+                        crCtx.fillStyle = box.color;
+                        const hs = 8, hxs = hs / 2;
+                        const handles = [
+                            {x: rx, y: ry}, {x: rx + rw, y: ry}, {x: rx, y: ry + rh}, {x: rx + rw, y: ry + rh},
+                            {x: rx + rw/2, y: ry}, {x: rx + rw/2, y: ry + rh}, {x: rx, y: ry + rh/2}, {x: rx + rw, y: ry + rh/2}
+                        ];
+                        handles.forEach(h => {
+                            crCtx.fillRect(h.x - hxs, h.y - hxs, hs, hs);
+                            crCtx.strokeStyle = '#ffffff'; crCtx.lineWidth = 1.5; crCtx.strokeRect(h.x - hxs, h.y - hxs, hs, hs);
+                        });
+                    }
+                    
+                    crCtx.fillStyle = box.color; crCtx.font = 'bold 11px Arial'; crCtx.fillText(box.label, rx, ry - 6);
+                });
+            }
+        }
+
+        function drawComposer() {
+            const c = cases[activeIdx];
+            
+            cmCtx.fillStyle = '#ffffff';
+            cmCtx.fillRect(0, 0, composeCanvas.width, composeCanvas.height);
+
+            // Grid
+            cmCtx.strokeStyle = '#f8fafc'; cmCtx.lineWidth = 1;
+            for(let i=0; i<composeCanvas.width; i+=20) { cmCtx.beginPath(); cmCtx.moveTo(i,0); cmCtx.lineTo(i,composeCanvas.height); cmCtx.stroke(); }
+            for(let i=0; i<composeCanvas.height; i+=20) { cmCtx.beginPath(); cmCtx.moveTo(0,i); cmCtx.lineTo(composeCanvas.width,i); cmCtx.stroke(); }
+
+            const sortedBoxes = [...c.boxes].sort((a,b) => (a.id === selectedBoxId ? 1 : (b.id === selectedBoxId ? -1 : 0)));
+
+            sortedBoxes.forEach(box => {
+                if (!box.enabled) return;
+
+                if (box.type === 'crop') {
+                    const sx = box.cx * c.compositeCanvas.width; 
+                    const sy = box.cy * c.compositeCanvas.height;
+                    const sw = box.cw * c.compositeCanvas.width; 
+                    const sh = box.ch * c.compositeCanvas.height;
+                    try { cmCtx.drawImage(c.compositeCanvas, sx, sy, sw, sh, box.ox, box.oy, box.ow, box.oh); } catch(e) {}
+                } else if (box.type === 'text') {
+                    // Draw Text Preview
+                    cmCtx.fillStyle = box.fontColor || '#000000';
+                    cmCtx.font = `bold ${box.fontSize || 24}px -apple-system, BlinkMacSystemFont, Arial, sans-serif`;
+                    cmCtx.textAlign = box.align || 'left';
+                    cmCtx.textBaseline = 'middle';
+                    let tx = box.ox;
+                    if (box.align === 'center') tx = box.ox + box.ow/2;
+                    if (box.align === 'right') tx = box.ox + box.ow;
+                    
+                    cmCtx.save();
+                    cmCtx.beginPath(); cmCtx.rect(box.ox, box.oy, box.ow, box.oh); cmCtx.clip();
+                    cmCtx.fillText(box.text || '', tx, box.oy + box.oh/2);
+                    cmCtx.restore();
+                }
+                
+                const isSelected = box.id === selectedBoxId;
+                cmCtx.strokeStyle = box.groupId ? '#8b5cf6' : (box.type==='text' ? '#3b82f6' : box.color); 
+                cmCtx.lineWidth = isSelected ? 2 : 1;
+                cmCtx.setLineDash(isSelected ? [] : [2, 2]);
+                cmCtx.strokeRect(box.ox, box.oy, box.ow, box.oh);
+                cmCtx.setLineDash([]);
+
+                if (isSelected) {
+                    cmCtx.fillStyle = box.groupId ? '#8b5cf6' : (box.type==='text' ? '#3b82f6' : box.color);
+                    cmCtx.fillRect(box.ox + box.ow - 10, box.oy + box.oh - 10, 12, 12);
+                    cmCtx.fillStyle = 'white'; cmCtx.fillRect(box.ox + box.ow - 6, box.oy + box.oh - 6, 4, 4);
+                }
+            });
+        }
+
+        window.addEventListener('resize', () => { if (activeTab === 'edit') requestAnimationFrame(renderEditors); });
+
+        btnAddCropBox.addEventListener('click', () => {
+            if (activeIdx === null) return;
+            const c = cases[activeIdx];
+            const newBox = {
+                id: generateId(), type: 'crop', color: COLORS[(colorCounter++) % COLORS.length], label: `Box ${c.boxes.length + 1}`,
+                cx: 0.1, cy: 0.1, cw: 0.25, ch: 0.25, ox: 20, oy: 20, ow: 100, oh: 100, groupId: null, enabled: true
+            };
+            c.boxes.push(newBox); selectedBoxId = newBox.id; setAnnotationTool('crop'); renderEditors();
+        });
+
+        btnAddTextBox.addEventListener('click', () => {
+            if (activeIdx === null) return;
+            const c = cases[activeIdx];
+            const newBox = {
+                id: generateId(), type: 'text', color: '#cbd5e1', label: `Text ${c.boxes.length + 1}`, text: 'New Text',
+                fontSize: 24, fontColor: '#1e293b', align: 'center', ox: 50, oy: 50, ow: 200, oh: 50, groupId: null, enabled: true
+            };
+            c.boxes.push(newBox); selectedBoxId = newBox.id; renderEditors();
+        });
+
+        function handlePropChange(id, prop, val, isNormalized=false) {
+            if (activeIdx === null) return;
+            const box = cases[activeIdx].boxes.find(b => b.id === id);
+            if (!box) return;
+            box[prop] = isNormalized ? parseFloat(val) : (['ox','oy','ow','oh','fontSize'].includes(prop) ? parseInt(val) : val);
+            renderEditors();
+        }
+
+        window.deleteSelectedBox = function() {
+            if (activeIdx === null || selectedBoxId === null) return;
+            cases[activeIdx].boxes = cases[activeIdx].boxes.filter(b => b.id !== selectedBoxId);
+            selectedBoxId = null; renderEditors();
+        }
+        
+        window.toggleSelectedBox = function(checkboxElem) {
+            if (activeIdx === null || selectedBoxId === null) return;
+            const box = cases[activeIdx].boxes.find(b => b.id === selectedBoxId);
+            if(box) box.enabled = checkboxElem.checked; renderEditors();
+        }
+
+        function updatePropertiesPanel() {
+            if (!selectedBoxId) {
+                boxProperties.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center space-y-3 opacity-60 py-6 mt-10">
+                        <svg class="w-12 h-12 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                        <p class="text-xs text-slate-400">Select an element to edit properties.</p>
+                    </div>`;
+                return;
+            }
+            const box = cases[activeIdx].boxes.find(b => b.id === selectedBoxId);
+            if (!box) return;
+
+            let specificProps = '';
+            if (box.type === 'crop') {
+                specificProps = `
+                    <div class="text-[10px] text-emerald-400 font-bold mt-4 mb-2 tracking-wider uppercase">Source Crop Bounds</div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="flex justify-between items-center bg-slate-950 p-1.5 rounded border border-slate-800"><span class="text-slate-500">X%</span><span class="text-slate-300 font-mono">${(box.cx*100).toFixed(1)}</span></div>
+                        <div class="flex justify-between items-center bg-slate-950 p-1.5 rounded border border-slate-800"><span class="text-slate-500">Y%</span><span class="text-slate-300 font-mono">${(box.cy*100).toFixed(1)}</span></div>
+                        <div class="flex justify-between items-center bg-slate-950 p-1.5 rounded border border-slate-800"><span class="text-slate-500">W%</span><span class="text-slate-300 font-mono">${(box.cw*100).toFixed(1)}</span></div>
+                        <div class="flex justify-between items-center bg-slate-950 p-1.5 rounded border border-slate-800"><span class="text-slate-500">H%</span><span class="text-slate-300 font-mono">${(box.ch*100).toFixed(1)}</span></div>
+                    </div>`;
+            } else if (box.type === 'text') {
+                specificProps = `
+                    <div class="text-[10px] text-blue-400 font-bold mt-4 mb-2 tracking-wider uppercase">Text Content & Style</div>
+                    <div class="space-y-3">
+                        <textarea onkeyup="handlePropChange('${box.id}', 'text', this.value)" class="w-full bg-slate-950 border border-slate-700 text-white p-2 rounded text-sm focus:border-emerald-500 outline-none resize-none h-16">${box.text}</textarea>
+                        <div class="grid grid-cols-3 gap-2 text-xs">
+                            <div>
+                                <label class="block text-[10px] text-slate-500 mb-1">Font Size</label>
+                                <input type="number" value="${box.fontSize}" onchange="handlePropChange('${box.id}', 'fontSize', this.value)" class="w-full bg-slate-950 p-1.5 rounded border border-slate-700 text-white outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-500 mb-1">Color</label>
+                                <input type="color" value="${box.fontColor}" onchange="handlePropChange('${box.id}', 'fontColor', this.value)" class="w-full h-7 rounded border border-slate-700 bg-slate-950 cursor-pointer p-0">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-500 mb-1">Align</label>
+                                <select onchange="handlePropChange('${box.id}', 'align', this.value)" class="w-full bg-slate-950 p-1.5 rounded border border-slate-700 text-white outline-none">
+                                    <option value="left" ${box.align==='left'?'selected':''}>Left</option>
+                                    <option value="center" ${box.align==='center'?'selected':''}>Center</option>
+                                    <option value="right" ${box.align==='right'?'selected':''}>Right</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+
+            boxProperties.innerHTML = `
+                <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-4 h-4 rounded shadow-sm inline-block" style="background-color: ${box.type === 'text' ? '#3b82f6' : box.color}"></span>
+                        <input type="text" value="${box.label}" onchange="handlePropChange('${box.id}', 'label', this.value)" class="bg-transparent border-b border-transparent hover:border-slate-700 focus:border-emerald-500 outline-none text-white font-bold w-40 px-1">
+                        <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded uppercase ml-2">${box.type}</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <label class="flex items-center text-xs cursor-pointer hover:text-white transition-colors">
+                            <input type="checkbox" ${box.enabled ? 'checked' : ''} onchange="toggleSelectedBox(this)" class="mr-1.5 rounded bg-slate-800 border-slate-700 cursor-pointer"> Visible
+                        </label>
+                        <button onclick="deleteSelectedBox()" class="text-xs bg-rose-500/10 hover:bg-rose-500 border border-rose-500/20 hover:border-rose-500 text-rose-400 hover:text-white px-2 py-1 rounded transition-all">Delete</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-left text-xs mb-2">
+                    <div>
+                        <div class="text-[10px] text-indigo-400 font-bold mb-1.5 tracking-wider uppercase">Position (px)</div>
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center bg-slate-950 p-1.5 rounded border border-slate-800"><span class="text-slate-400 ml-1">X</span><input type="number" value="${Math.round(box.ox)}" onchange="handlePropChange('${box.id}', 'ox', this.value)" class="w-16 bg-transparent text-white text-right outline-none font-mono focus:text-emerald-400 border-b border-transparent focus:border-emerald-500"></div>
+                            <div class="flex justify-between items-center bg-slate-950 p-1.5 rounded border border-slate-800"><span class="text-slate-400 ml-1">Y</span><input type="number" value="${Math.round(box.oy)}" onchange="handlePropChange('${box.id}', 'oy', this.value)" class="w-16 bg-transparent text-white text-right outline-none font-mono focus:text-emerald-400 border-b border-transparent focus:border-emerald-500"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-indigo-400 font-bold mb-1.5 tracking-wider uppercase">Size (px)</div>
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center bg-slate-950 p-1.5 rounded border border-slate-800"><span class="text-slate-400 ml-1">W</span><input type="number" value="${Math.round(box.ow)}" onchange="handlePropChange('${box.id}', 'ow', this.value)" class="w-16 bg-transparent text-white text-right outline-none font-mono focus:text-emerald-400 border-b border-transparent focus:border-emerald-500"></div>
+                            <div class="flex justify-between items-center bg-slate-950 p-1.5 rounded border border-slate-800"><span class="text-slate-400 ml-1">H</span><input type="number" value="${Math.round(box.oh)}" onchange="handlePropChange('${box.id}', 'oh', this.value)" class="w-16 bg-transparent text-white text-right outline-none font-mono focus:text-emerald-400 border-b border-transparent focus:border-emerald-500"></div>
+                        </div>
+                    </div>
+                </div>
+                ${specificProps}
+            `;
+        }
+
+        let dragCtx = null;
+
+        function getPointerPos(canvasElem, e) {
+            const rect = canvasElem.getBoundingClientRect();
+            return {
+                x: (e.clientX - rect.left) * (canvasElem.width / rect.width),
+                y: (e.clientY - rect.top) * (canvasElem.height / rect.height)
+            };
+        }
+
+        // --- Cropper & Drawing Canvas Events ---
+        function getCropHitInfo(canvasElem, pointer) {
+            const mx = pointer.x, my = pointer.y;
+            const c = cases[activeIdx];
+            for (let i = c.boxes.length - 1; i >= 0; i--) {
+                const box = c.boxes[i];
+                if (!box.enabled || box.type !== 'crop') continue;
+                const rx = box.cx * canvasElem.width, ry = box.cy * canvasElem.height;
+                const rw = box.cw * canvasElem.width, rh = box.ch * canvasElem.height;
+
+                if (selectedBoxId === box.id) {
+                    const hs = 18; 
+                    const corners = [{type:'tl',x:rx,y:ry},{type:'tr',x:rx+rw,y:ry},{type:'bl',x:rx,y:ry+rh},{type:'br',x:rx+rw,y:ry+rh},{type:'t',x:rx+rw/2,y:ry},{type:'b',x:rx+rw/2,y:ry+rh},{type:'l',x:rx,y:ry+rh/2},{type:'r',x:rx+rw,y:ry+rh/2}];
+                    for (let h of corners) if (Math.hypot(mx - h.x, my - h.y) <= hs) return { box, action: 'resize-crop', handle: h.type, startX: mx, startY: my, ox: rx, oy: ry, ow: rw, oh: rh, cx: box.cx, cy: box.cy, cw: box.cw, ch: box.ch };
+                }
+                if (mx >= rx && mx <= rx + rw && my >= ry && my <= ry + rh) return { box, action: 'move-crop', startX: mx, startY: my, ox: rx, oy: ry, ow: rw, oh: rh, cx: box.cx, cy: box.cy, cw: box.cw, ch: box.ch };
+            }
+            return null;
+        }
+
+        cropCanvas.addEventListener('pointerdown', (e) => {
+            if (activeIdx === null) return;
+            const pos = getPointerPos(cropCanvas, e);
+            cropCanvas.setPointerCapture(e.pointerId);
+
+            if (annotationTool === 'draw' || annotationTool === 'arrow') {
+                drawState.isDrawing = true;
+                drawState.points = [{ x: pos.x / cropCanvas.width, y: pos.y / cropCanvas.height }];
+                if(annotationTool === 'arrow') drawState.points.push({...drawState.points[0]}); // start and end
+                return;
+            }
+
+            const hit = getCropHitInfo(cropCanvas, pos);
+            if (hit) { selectedBoxId = hit.box.id; dragCtx = { ...hit, elemW: cropCanvas.width, elemH: cropCanvas.height }; } 
+            else { selectedBoxId = null; }
+            renderEditors();
+        });
+
+        cropCanvas.addEventListener('pointermove', (e) => {
+            const pos = getPointerPos(cropCanvas, e);
+            
+            if (drawState.isDrawing) {
+                const normPos = { x: pos.x / cropCanvas.width, y: pos.y / cropCanvas.height };
+                if (annotationTool === 'draw') drawState.points.push(normPos);
+                else if (annotationTool === 'arrow') drawState.points[1] = normPos;
+                requestAnimationFrame(drawCropper);
+                return;
+            }
+
+            if (!dragCtx) {
+                if (annotationTool === 'crop') {
+                    const hit = getCropHitInfo(cropCanvas, pos);
+                    if (hit && hit.action.includes('resize')) cropCanvas.style.cursor = 'nwse-resize';
+                    else if (hit) cropCanvas.style.cursor = 'move';
+                    else cropCanvas.style.cursor = 'crosshair';
+                }
+                return;
+            }
+
+            const dx = pos.x - dragCtx.startX, dy = pos.y - dragCtx.startY;
+            const box = dragCtx.box, ew = dragCtx.elemW, eh = dragCtx.elemH;
+
+            if (dragCtx.action === 'move-crop') {
+                box.cx = Math.max(0, Math.min((dragCtx.ox + dx) / ew, 1 - box.cw));
+                box.cy = Math.max(0, Math.min((dragCtx.oy + dy) / eh, 1 - box.ch));
+            } else if (dragCtx.action === 'resize-crop') {
+                let h = dragCtx.handle, o_rx = dragCtx.ox, o_ry = dragCtx.oy, o_rw = dragCtx.ow, o_rh = dragCtx.oh;
+                let newRx = o_rx, newRy = o_ry, newRw = o_rw, newRh = o_rh;
+
+                if (h.includes('l')) { newRx = Math.max(0, o_rx + dx); newRw = o_rw - (newRx - o_rx); }
+                if (h.includes('r')) { newRw = Math.max(20, o_rw + dx); }
+                if (h.includes('t')) { newRy = Math.max(0, o_ry + dy); newRh = o_rh - (newRy - o_ry); }
+                if (h.includes('b')) { newRh = Math.max(20, o_rh + dy); }
+
+                box.cx = newRx / ew; box.cy = newRy / eh;
+                box.cw = Math.min(1 - box.cx, newRw / ew); box.ch = Math.min(1 - box.cy, newRh / eh);
+            }
+            requestAnimationFrame(renderEditors);
+        });
+
+        const endCropAction = (e) => {
+            cropCanvas.releasePointerCapture(e.pointerId);
+            if (drawState.isDrawing) {
+                drawState.isDrawing = false;
+                if(drawState.points.length > 0) {
+                    cases[activeIdx].annotations.push({
+                        type: annotationTool, color: drawColor.value, width: drawSize.value, points: [...drawState.points]
+                    });
+                    updateCaseComposite(cases[activeIdx]);
+                    renderSidebar(); renderEditors();
+                }
+                drawState.points = [];
+            }
+            if (dragCtx) dragCtx = null;
+        };
+        cropCanvas.addEventListener('pointerup', endCropAction);
+        cropCanvas.addEventListener('pointercancel', endCropAction);
+
+
+        // --- Composer Canvas Events ---
+        function getComposerHitInfo(canvasElem, pointer) {
+            const mx = pointer.x, my = pointer.y;
+            const c = cases[activeIdx];
+            for (let i = c.boxes.length - 1; i >= 0; i--) {
+                const box = c.boxes[i];
+                if (!box.enabled) continue;
+                const bx = box.ox, by = box.oy, bw = box.ow, bh = box.oh;
+
+                if (selectedBoxId === box.id) {
+                    if (mx >= bx + bw - 15 && mx <= bx + bw + 15 && my >= by + bh - 15 && my <= by + bh + 15) return { box, action: 'resize-composer', startX: mx, startY: my, ox: bx, oy: by, ow: bw, oh: bh };
+                }
+                if (mx >= bx && mx <= bx + bw && my >= by && my <= by + bh) return { box, action: 'move-composer', startX: mx, startY: my, ox: bx, oy: by, ow: bw, oh: bh };
+            }
+            return null;
+        }
+
+        composeCanvas.addEventListener('pointerdown', (e) => {
+            if (activeIdx === null) return;
+            const pos = getPointerPos(composeCanvas, e);
+            const hit = getComposerHitInfo(composeCanvas, pos);
+            if (hit) { selectedBoxId = hit.box.id; dragCtx = { ...hit }; composeCanvas.setPointerCapture(e.pointerId); } 
+            else { selectedBoxId = null; }
+            renderEditors();
+        });
+
+        composeCanvas.addEventListener('pointermove', (e) => {
+            if (!dragCtx) return;
+            const pos = getPointerPos(composeCanvas, e);
+            const dx = pos.x - dragCtx.startX, dy = pos.y - dragCtx.startY;
+            const box = dragCtx.box;
+
+            if (dragCtx.action === 'move-composer') {
+                box.ox = dragCtx.ox + dx; box.oy = dragCtx.oy + dy;
+            } else if (dragCtx.action === 'resize-composer') {
+                box.ow = Math.max(15, dragCtx.ow + dx); box.oh = Math.max(15, dragCtx.oh + dy);
+            }
+            requestAnimationFrame(renderEditors);
+        });
+
+        const endComposeAction = (e) => { if(dragCtx) { composeCanvas.releasePointerCapture(e.pointerId); dragCtx = null; } };
+        composeCanvas.addEventListener('pointerup', endComposeAction);
+        composeCanvas.addEventListener('pointercancel', endComposeAction);
+
+
+        // --- Freeform A4 Canvas Events ---
+        let a4DragCtx = null;
+        masterCanvas.addEventListener('pointerdown', (e) => {
+            if (globalA4.mode !== 'free' || activeTab !== 'preview') return;
+            const pos = getPointerPos(masterCanvas, e);
+            const cW = globalA4.cellW, cH = globalA4.cellH;
+            
+            // Hit test cases in reverse (top most)
+            const activeCases = cases.filter(c => c.enabled);
+            for(let i = activeCases.length - 1; i >= 0; i--) {
+                const c = activeCases[i];
+                if (pos.x >= c.a4x && pos.x <= c.a4x + cW && pos.y >= c.a4y && pos.y <= c.a4y + cH) {
+                    a4DragCtx = { c, startX: pos.x, startY: pos.y, initX: c.a4x, initY: c.a4y };
+                    masterCanvas.setPointerCapture(e.pointerId);
+                    masterCanvas.style.cursor = 'grabbing';
+                    break;
+                }
+            }
+        });
+
+        masterCanvas.addEventListener('pointermove', (e) => {
+            if (!a4DragCtx) return;
+            const pos = getPointerPos(masterCanvas, e);
+            a4DragCtx.c.a4x = a4DragCtx.initX + (pos.x - a4DragCtx.startX);
+            a4DragCtx.c.a4y = a4DragCtx.initY + (pos.y - a4DragCtx.startY);
+            requestAnimationFrame(drawA4);
+        });
+
+        const endA4Action = (e) => { 
+            if(a4DragCtx) { 
+                masterCanvas.releasePointerCapture(e.pointerId); 
+                a4DragCtx = null; 
+                masterCanvas.style.cursor = 'grab';
+            } 
+        };
+        masterCanvas.addEventListener('pointerup', endA4Action);
+        masterCanvas.addEventListener('pointercancel', endA4Action);
+
+        // Zoom functionality for preview
+        function updateZoom() {
+            masterCanvas.style.transform = `scale(${zoomVal})`;
+            zoomLevel.innerText = Math.round(zoomVal * 100) + '%';
+        }
+        btnZoomIn.addEventListener('click', () => { zoomVal = Math.min(2.0, zoomVal + 0.1); updateZoom(); });
+        btnZoomOut.addEventListener('click', () => { zoomVal = Math.max(0.2, zoomVal - 0.1); updateZoom(); });
+
+        btnBatchModal.addEventListener('click', () => {
+            if (activeIdx === null) return;
+            modalList.innerHTML = '';
+            let count = 0;
+            cases.forEach((c, idx) => {
+                if (idx === activeIdx) return;
+                count++;
+                const label = document.createElement('label');
+                label.className = 'flex items-center space-x-3 p-3 hover:bg-slate-800 rounded-xl cursor-pointer border border-transparent hover:border-slate-700 transition-colors';
+                label.innerHTML = `<input type="checkbox" checked data-idx="${idx}" class="batch-cb w-5 h-5 rounded border-slate-600 cursor-pointer text-emerald-500 bg-slate-950 focus:ring-emerald-500"><span class="text-sm font-semibold text-white">${c.name}</span>`;
+                modalList.appendChild(label);
+            });
+
+            if(count === 0) { modalList.innerHTML = '<div class="text-slate-500 text-center p-4 font-bold">No other cases available to apply template to.</div>'; btnConfirmBatch.disabled = true; } 
+            else { btnConfirmBatch.disabled = false; }
+
+            batchModal.classList.remove('hidden');
+            setTimeout(() => { batchModal.classList.remove('opacity-0'); batchModalInner.classList.remove('scale-95'); }, 10);
+        });
+
+        function closeBatchModal() {
+            batchModal.classList.add('opacity-0'); batchModalInner.classList.add('scale-95');
+            setTimeout(() => batchModal.classList.add('hidden'), 200);
+        }
+
+        btnCloseModal.addEventListener('click', closeBatchModal);
+        btnSelectAll.addEventListener('click', () => document.querySelectorAll('.batch-cb').forEach(cb => cb.checked = true));
+        btnSelectNone.addEventListener('click', () => document.querySelectorAll('.batch-cb').forEach(cb => cb.checked = false));
+
+        btnConfirmBatch.addEventListener('click', () => {
+            const templateBoxes = JSON.stringify(cases[activeIdx].boxes);
+            document.querySelectorAll('.batch-cb:checked').forEach(cb => {
+                const targetIdx = parseInt(cb.getAttribute('data-idx'));
+                cases[targetIdx].boxes = JSON.parse(templateBoxes);
+                cases[targetIdx].boxes.forEach(b => b.id = generateId());
+            });
+            closeBatchModal(); drawA4();
+            
+            const orig = btnConfirmBatch.innerText;
+            btnConfirmBatch.innerText = 'Template Applied Successfully! 🎉';
+            btnConfirmBatch.classList.replace('bg-emerald-600', 'bg-indigo-600');
+            setTimeout(() => { btnConfirmBatch.innerText = orig; btnConfirmBatch.classList.replace('bg-indigo-600', 'bg-emerald-600'); }, 2000);
+        });
+
+        btnDownload.addEventListener('click', () => {
+            drawA4();
+            btnDownload.innerHTML = '<svg class="animate-spin w-4 h-4 mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Exporting...';
+            
+            setTimeout(() => {
+                masterCanvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a'); a.href = url;
+                    let safeTitle = (sheetTitle.value || 'PLL_Sheet').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                    a.download = `${safeTitle}_v1000.png`;
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+                    
+                    btnDownload.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Export HD PNG';
+                }, 'image/png', 1.0);
+            }, 300);
+        });
+
+        // Init
+        updateGlobals();
     </script>
 </body>
 </html>
