@@ -3,466 +3,1513 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLL Sheet Canvas Editor</title>
+    <title>PLL Sheet Studio - Ultimate Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --bg-dark: #1e1e1e;
-            --panel-bg: #2d2d2d;
+            --bg-dark: #121212;
+            --panel-bg: #1e1e1e;
             --accent: #4CAF50;
             --accent-hover: #45a049;
+            --accent-blue: #2196F3;
             --text-main: #ffffff;
             --text-muted: #b0b0b0;
-            --border: #444;
+            --border: #383838;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #121212;
+            background-color: var(--bg-dark);
             color: var(--text-main);
             margin: 0;
             display: flex;
+            flex-direction: column;
             height: 100vh;
             overflow: hidden;
         }
 
+        header.topnav {
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            height: 55px;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .topnav-brand {
+            font-weight: bold;
+            font-size: 15px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .topnav-tabs {
+            display: flex;
+            gap: 6px;
+            height: 100%;
+            align-items: center;
+        }
+
+        .nav-tab {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-main);
+            background: rgba(255,255,255,0.08);
+        }
+
+        .nav-tab.active {
+            color: var(--text-main);
+            background: #2a2a2a;
+            border-bottom: 3px solid var(--accent);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .app-layout {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
         sidebar {
-            width: 350px;
+            width: 380px;
             background: var(--panel-bg);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             height: 100%;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.5);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.5);
             z-index: 10;
+            flex-shrink: 0;
         }
 
-        .sidebar-header {
-            padding: 20px;
+        .sidebar-top {
+            padding: 12px 16px;
             border-bottom: 1px solid var(--border);
-            background: var(--bg-dark);
+            background: var(--panel-bg);
+            flex-shrink: 0;
         }
 
-        .sidebar-header h2 {
-            margin: 0 0 10px 0;
-            font-size: 20px;
-        }
-
-        .sidebar-content {
-            padding: 20px;
+        .sidebar-scroll {
+            padding: 16px;
             overflow-y: auto;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
+        }
+
+        .sidebar-bottom {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            background: var(--panel-bg);
+            flex-shrink: 0;
+            display: flex;
+            gap: 8px;
         }
 
         .section-group {
-            background: var(--bg-dark);
-            padding: 15px;
-            border-radius: 6px;
+            background: #252525;
+            padding: 14px;
+            border-radius: 8px;
             border: 1px solid var(--border);
         }
 
         .section-group h3 {
             margin: 0 0 12px 0;
-            font-size: 14px;
+            font-size: 13px;
             color: var(--accent);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         label {
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
+            font-size: 11px;
             color: var(--text-muted);
-            margin-bottom: 5px;
+            margin-bottom: 4px;
+            font-weight: 500;
         }
 
-        input[type="range"] {
+        input[type="range"], select {
             width: 100%;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            background: #1a1a1a;
+            color: white;
+            border: 1px solid var(--border);
+            padding: 5px;
+            border-radius: 4px;
         }
 
-        input[type="text"], input[type="file"] {
+        input[type="text"], input[type="file"], input[type="color"] {
             width: 100%;
-            padding: 8px;
-            background: #121212;
+            padding: 8px 10px;
+            background: #1a1a1a;
             border: 1px solid var(--border);
             color: white;
             border-radius: 4px;
             box-sizing: border-box;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        input[type="color"] {
+            height: 36px;
+            padding: 2px;
+            cursor: pointer;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
         .btn {
             background-color: var(--accent);
             color: white;
             border: none;
-            padding: 10px 15px;
-            font-size: 14px;
+            padding: 8px 12px;
+            font-size: 12px;
             border-radius: 4px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
             width: 100%;
             transition: background 0.2s;
+            text-align: center;
         }
 
         .btn:hover { background-color: var(--accent-hover); }
-        .btn:disabled { background-color: #555; cursor: not-allowed; }
-        .btn-secondary { background-color: #444; margin-top: 5px; width: 100%; }
-        .btn-secondary:hover { background-color: #555; }
+        .btn:disabled { background-color: #444; color: #888; cursor: not-allowed; }
+        .btn-secondary { background-color: #383838; }
+        .btn-secondary:hover { background-color: #4d4d4d; }
+        .btn-danger { background-color: #d32f2f; }
+        .btn-danger:hover { background-color: #b71c1c; }
+        .btn-blue { background-color: var(--accent-blue); }
+        .btn-blue:hover { background-color: #1976D2; }
 
         .thumb-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             max-height: 180px;
             overflow-y: auto;
+            border: 1px solid var(--border);
+            padding: 4px;
+            border-radius: 4px;
+            background: #1a1a1a;
         }
 
         .thumb-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            background: #121212;
+            gap: 8px;
+            background: #252525;
             padding: 6px;
             border-radius: 4px;
-            border: 1px solid var(--border);
+            border: 1px solid transparent;
             cursor: pointer;
+            transition: all 0.15s;
         }
 
-        .thumb-item.active {
-            border-color: var(--accent);
-        }
-
-        .thumb-item img {
-            width: 30px;
-            height: 30px;
-            object-fit: cover;
-            border-radius: 2px;
-        }
-
-        .thumb-item span {
-            font-size: 12px;
-            flex-grow: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        .thumb-item:hover { background: #303030; }
+        .thumb-item.active { border-color: var(--accent); background: #2c3e2e; }
+        .thumb-item img { width: 26px; height: 26px; object-fit: cover; border-radius: 4px; border: 1px solid #444; }
+        .thumb-item span { font-size: 11px; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         main {
             flex-grow: 1;
-            background: #181818;
+            background: #0a0a0a;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
             overflow: auto;
+            position: relative;
         }
 
         canvas {
             background: white;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            cursor: crosshair;
             max-height: 90vh;
             width: auto;
+            border-radius: 2px;
+        }
+
+        .page-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: row;
+        }
+
+        .page-view.active-page {
+            display: flex;
+        }
+
+        .help-text {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        /* Toast Notification */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #2e7d32;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 1000;
+            display: none;
+            transition: opacity 0.3s ease;
         }
     </style>
 </head>
 <body>
 
-    <sidebar>
-        <div class="sidebar-header">
-            <h2>PLL Sheet Studio</h2>
-            <input type="file" id="imageUpload" multiple accept="image/*">
+    <header class="topnav">
+        <div class="topnav-brand">
+            <span>🧊 PLL Sheet Studio - Ultimate</span>
         </div>
+        <div class="topnav-tabs">
+            <button class="nav-tab active" data-page="gridPage">1. Sheet Generator & OG Sliders</button>
+            <button class="nav-tab" data-page="fineTunePage">2. Extra Fine-Tuning</button>
+            <button class="nav-tab" data-page="freeformPage">3. Block Customizer</button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary" id="exportProjectBtn" style="padding: 8px 12px; font-size: 11px; border-radius: 6px;">Export JSON</button>
+            <button class="btn btn-secondary" id="importProjectBtn" style="padding: 8px 12px; font-size: 11px; border-radius: 6px;">Import JSON</button>
+            <input type="file" id="importFile" accept=".json" style="display:none">
+            <button class="btn" id="globalDownloadBtn" style="padding: 8px 16px; font-size: 12px; border-radius: 6px;">Export High-Res PNG</button>
+        </div>
+    </header>
 
-        <div class="sidebar-content">
-            <div class="section-group">
-                <h3>Sheet Settings</h3>
-                <label>Sheet Title</label>
-                <input type="text" id="sheetTitle" value="PLL Algorithms Cheat Sheet">
+    <div id="gridPage" class="page-view active-page">
+        <sidebar>
+            <div class="sidebar-top">
+                <input type="file" class="imageUploadGlobal" multiple accept="image/*">
             </div>
+            <div class="sidebar-scroll">
+                <div class="section-group">
+                    <h3>Presets & Quick Styles</h3>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="presetStandard">Standard 3-Col</button>
+                        <button class="btn btn-secondary" id="presetCompact">Compact Grid</button>
+                        <button class="btn btn-secondary" id="presetSpacious">Spacious Study</button>
+                    </div>
+                </div>
 
-            <div class="section-group">
-                <h3>Cases Manager (<span id="caseCount">0</span>)</h3>
-                <button class="btn btn-secondary" id="reverseOrderBtn" style="margin-bottom: 10px;">Reverse Order</button>
-                <div class="thumb-list" id="thumbList">
-                    <div style="font-size: 12px; color: #777; text-align: center; padding: 10px;">No images uploaded yet.</div>
+                <div class="section-group">
+                    <h3>Sheet Properties & OG Canvas</h3>
+                    <label>Sheet Title</label>
+                    <input type="text" id="sheetTitle" value="Advanced Algorithm Sheet">
+                    <label>Subtitle / Footer Text</label>
+                    <input type="text" id="sheetSubtitle" value="Generated with PLL Sheet Studio">
+                    <label>Columns Layout</label>
+                    <select id="columnLayout">
+                        <option value="1">1 Column</option>
+                        <option value="2">2 Columns</option>
+                        <option value="3" selected>3 Columns</option>
+                        <option value="4">4 Columns</option>
+                    </select>
+                    <label>Sheet Theme Background</label>
+                    <select id="sheetTheme">
+                        <option value="white" selected>Clean White</option>
+                        <option value="cream">Classic Parchment</option>
+                        <option value="dark">Dark Cyber Mode</option>
+                        <option value="blueprint">Blueprint Grid</option>
+                    </select>
+                </div>
+                
+                <div class="section-group">
+                    <h3>OG Margin & Spacing Sliders</h3>
+                    <label>Sheet Top/Bottom Margin: <span id="valSheetMarginY">100</span>px</label>
+                    <input type="range" id="sheetMarginY" min="40" max="250" value="100">
+                    <label>Sheet Left/Right Margin: <span id="valSheetMarginX">80</span>px</label>
+                    <input type="range" id="sheetMarginX" min="30" max="200" value="80">
+                    <label>Grid Row Gap: <span id="valRowGap">25</span>px</label>
+                    <input type="range" id="rowGap" min="5" max="80" value="25">
+                    <label>Grid Column Gap: <span id="valColGap">20</span>px</label>
+                    <input type="range" id="colGap" min="5" max="80" value="20">
+                </div>
+
+                <div class="section-group">
+                    <h3>Global Case & Alg Box Sliders</h3>
+                    <label>Mini Case Size: <span id="valGridCaseS">90</span>px</label>
+                    <input type="range" id="gridCaseS" min="40" max="180" value="90">
+                    <label>Mini Case X Offset: <span id="valGridCaseX">10</span>px</label>
+                    <input type="range" id="gridCaseX" min="0" max="200" value="10">
+                    <label>Mini Case Y Offset: <span id="valGridCaseY">15</span>px</label>
+                    <input type="range" id="gridCaseY" min="0" max="100" value="15">
+                    
+                    <div style="height:8px;"></div>
+                    
+                    <label>Mini Alg Width: <span id="valGridAlgW">210</span>px</label>
+                    <input type="range" id="gridAlgW" min="50" max="400" value="210">
+                    <label>Mini Alg Height: <span id="valGridAlgH">60</span>px</label>
+                    <input type="range" id="gridAlgH" min="30" max="150" value="60">
+                    <label>Mini Alg X Offset: <span id="valGridAlgX">115</span>px</label>
+                    <input type="range" id="gridAlgX" min="0" max="300" value="115">
+                </div>
+
+                <div class="section-group">
+                    <h3>Cases Manager (<span class="caseCount">0</span>)</h3>
+                    <input type="text" id="searchFilter" placeholder="🔍 Search cases by name...">
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="reverseOrderBtn">Reverse Order</button>
+                        <button class="btn btn-danger" id="clearAllBtn">Clear All</button>
+                    </div>
+                    <div class="thumb-list renderThumbList">
+                        <div style="font-size: 11px; color: #777; text-align: center; padding: 10px;">Upload images to start.</div>
+                    </div>
                 </div>
             </div>
+        </sidebar>
+        <main>
+            <canvas id="gridCanvas" width="1240" height="1754"></canvas>
+        </main>
+    </div>
 
-            <div class="section-group">
-                <h3>Crop Fine-Tuning</h3>
-                
-                <label>Case Crop X: <span id="val-caseX">4</span>%</label>
-                <input type="range" id="caseX" min="0" max="40" value="4">
-
-                <label>Case Crop Y: <span id="val-caseY">74</span>%</label>
-                <input type="range" id="caseY" min="50" max="90" value="74">
-
-                <label>Case Crop Size: <span id="val-caseSize">15</span>%</label>
-                <input type="range" id="caseSize" min="5" max="30" value="15">
-
-                <hr style="border-color: var(--border); margin: 10px 0;">
-
-                <label>Alg Crop Height: <span id="val-algH">22</span>%</label>
-                <input type="range" id="algH" min="10" max="40" value="22">
-
-                <button class="btn btn-secondary" id="applyToAllBtn">Apply Settings to All Cases</button>
+    <div id="fineTunePage" class="page-view">
+        <sidebar>
+            <div class="sidebar-top">
+                <input type="file" class="imageUploadGlobal" multiple accept="image/*">
             </div>
+            <div class="sidebar-scroll">
+                <div class="section-group">
+                    <h3>Extraction & Precision Control</h3>
+                    <div class="help-text">Drag the Green/Blue boxes on the original full image to capture exactly what you need.</div>
+                    <div class="btn-group">
+                        <button class="btn btn-blue" id="applyCropToAllBtn">Apply Crop To All</button>
+                    </div>
+                </div>
 
-            <button class="btn" id="downloadBtn" disabled>Download A4 Sheet</button>
-        </div>
-    </sidebar>
+                <div class="section-group">
+                    <h3>Active Crop Sliders</h3>
+                    <label>Original Image X: <span id="valFineX">0</span>px</label>
+                    <input type="range" id="fineSliderX" min="0" max="1000" value="0">
+                    <label>Original Image Y: <span id="valFineY">0</span>px</label>
+                    <input type="range" id="fineSliderY" min="0" max="1000" value="0">
+                    <label>Crop Width: <span id="valFineW">100</span>px</label>
+                    <input type="range" id="fineSliderW" min="20" max="1000" value="100">
+                    <label>Crop Height: <span id="valFineH">100</span>px</label>
+                    <input type="range" id="fineSliderH" min="20" max="1000" value="100">
+                </div>
 
-    <main>
-        <canvas id="sheetCanvas" width="1240" height="1754"></canvas>
-    </main>
+                <div class="section-group">
+                    <h3>Extra Annotations</h3>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="addBoxBtn">+ Draw Box</button>
+                        <button class="btn btn-secondary" id="addTextBtn">+ Draw Text</button>
+                    </div>
+                </div>
+
+                <div class="section-group">
+                    <h3>Select Active Case</h3>
+                    <div class="thumb-list renderThumbList"></div>
+                </div>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="btn btn-secondary" id="moveUpBtn" title="Move Case Up">▲ Up</button>
+                <button class="btn btn-secondary" id="moveDownBtn" title="Move Case Down">▼ Down</button>
+                <button class="btn btn-danger" id="deleteFineItemBtn" disabled>Delete Object</button>
+            </div>
+        </sidebar>
+        <main>
+            <canvas id="fineCanvas" width="1240" height="1754"></canvas>
+        </main>
+    </div>
+
+    <div id="freeformPage" class="page-view">
+        <sidebar>
+            <div class="sidebar-top">
+                <input type="file" class="imageUploadGlobal" multiple accept="image/*">
+            </div>
+            <div class="sidebar-scroll">
+                <div class="section-group">
+                    <h3>Custom Block Placer</h3>
+                    <div class="help-text">
+                        Drag the large blocks around the sheet. <br><br>
+                        <strong>Magic Feature:</strong> Click INSIDE a block to drag the Mini Case or Mini Algorithm to design your own custom layouts!
+                    </div>
+                    <button class="btn btn-blue" id="syncBlockLayoutBtn" style="margin-bottom: 8px;">Apply Selected Block Layout to All</button>
+                    <button class="btn btn-secondary" id="resetFreeformPositionsBtn">Auto-Arrange Blocks</button>
+                </div>
+                
+                <div class="section-group">
+                    <h3>Select Active Case</h3>
+                    <div class="thumb-list renderThumbList"></div>
+                </div>
+            </div>
+        </sidebar>
+        <main>
+            <canvas id="freeCanvas" width="1240" height="1754"></canvas>
+        </main>
+    </div>
+
+    <div id="toast">Notification Message</div>
 
     <script>
-        const canvas = document.getElementById('sheetCanvas');
-        const ctx = canvas.getContext('2d');
-        const imageUpload = document.getElementById('imageUpload');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const sheetTitleInput = document.getElementById('sheetTitle');
-        const thumbList = document.getElementById('thumbList');
-        const caseCountDisplay = document.getElementById('caseCount');
-        const applyToAllBtn = document.getElementById('applyToAllBtn');
-        const reverseOrderBtn = document.getElementById('reverseOrderBtn');
-
-        const sliderCaseX = document.getElementById('caseX');
-        const sliderCaseY = document.getElementById('caseY');
-        const sliderCaseSize = document.getElementById('caseSize');
-        const sliderAlgH = document.getElementById('algH');
-
+        // Data Architecture
         let casesData = [];
         let selectedIndex = null;
+        let searchQuery = "";
+        
+        // Page 1 Global Layout & OG Sliders Settings
+        let sheetProps = {
+            title: "Advanced Algorithm Sheet",
+            subtitle: "Generated with PLL Sheet Studio",
+            columns: 3,
+            theme: "white",
+            marginTopY: 100,
+            marginRowX: 80,
+            rowGap: 25,
+            colGap: 20
+        };
 
-        function updateSliderLabels() {
-            document.getElementById('val-caseX').innerText = sliderCaseX.value;
-            document.getElementById('val-caseY').innerText = sliderCaseY.value;
-            document.getElementById('val-caseSize').innerText = sliderCaseSize.value;
-            document.getElementById('val-algH').innerText = sliderAlgH.value;
+        let globalLayout = {
+            caseS: 90,
+            caseX: 10,
+            caseY: 15,
+            algW: 210,
+            algH: 60,
+            algX: 115
+        };
+
+        // Page 2 State
+        let activeFineObj = null;
+        let isDraggingFine = false;
+        let fineResizingHandle = null;
+        let fineScale = 1;
+        let fineOffsetX = 0, fineOffsetY = 0;
+        let fineDragStartX = 0, fineDragStartY = 0;
+
+        // Page 3 State
+        let selectedFreeIndex = null;
+        let activeFreeDragMode = null;
+        let freeDragOffX = 0, freeDragOffY = 0;
+        let freeResizingHandle = null;
+
+        const handleSize = 12;
+
+        // Toast Notification Helper (No alerts!)
+        function showToast(msg, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => { toast.style.display = 'none'; }, 300);
+            }, duration);
         }
 
-        imageUpload.addEventListener('change', (e) => {
-            const files = Array.from(e.target.files);
-            if (files.length === 0) return;
-
-            let loadedFiles = 0;
-            files.forEach((file) => {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        casesData.push({
-                            img: img,
-                            name: file.name,
-                            enabled: true,
-                            caseX: 0.04,
-                            caseY: 0.74,
-                            caseSize: 0.15,
-                            algH: 0.22
-                        });
-                        loadedFiles++;
-                        if (loadedFiles === files.length) {
-                            if (selectedIndex === null) selectedIndex = 0;
-                            updateThumbnails();
-                            loadSettingsToSliders(selectedIndex);
-                            drawSheet();
-                        }
-                    };
-                    img.src = event.target.result;
+        // --- LocalStorage Persistence ---
+        function saveToLocalStorage() {
+            try {
+                // We serialize casesData by converting images to base64 data URLs
+                const saveData = {
+                    sheetProps,
+                    globalLayout,
+                    cases: casesData.map(c => ({
+                        name: c.name,
+                        enabled: c.enabled,
+                        category: c.category || 'General',
+                        dataUrl: c.dataUrl,
+                        cropCase: c.cropCase,
+                        cropAlg: c.cropAlg,
+                        extraObjs: c.extraObjs,
+                        freeBlock: c.freeBlock,
+                        layoutCase: c.layoutCase,
+                        layoutAlg: c.layoutAlg
+                    }))
                 };
-                reader.readAsDataURL(file);
+                localStorage.setItem('pll_sheet_studio_data', JSON.stringify(saveData));
+            } catch (e) {
+                console.error("Failed to save to localStorage:", e);
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('pll_sheet_studio_data');
+                if (!saved) return;
+                const parsed = JSON.parse(saved);
+                if (parsed.sheetProps) sheetProps = { ...sheetProps, ...parsed.sheetProps };
+                if (parsed.globalLayout) globalLayout = { ...globalLayout, ...parsed.globalLayout };
+                
+                // Sync UI inputs with loaded props
+                document.getElementById('sheetTitle').value = sheetProps.title;
+                document.getElementById('sheetSubtitle').value = sheetProps.subtitle;
+                document.getElementById('columnLayout').value = sheetProps.columns;
+                document.getElementById('sheetTheme').value = sheetProps.theme;
+                document.getElementById('sheetMarginY').value = sheetProps.marginTopY;
+                document.getElementById('valSheetMarginY').innerText = sheetProps.marginTopY;
+                document.getElementById('sheetMarginX').value = sheetProps.marginRowX;
+                document.getElementById('valSheetMarginX').innerText = sheetProps.marginRowX;
+                document.getElementById('rowGap').value = sheetProps.rowGap;
+                document.getElementById('valRowGap').innerText = sheetProps.rowGap;
+                document.getElementById('colGap').value = sheetProps.colGap;
+                document.getElementById('valColGap').innerText = sheetProps.colGap;
+
+                // Load slider values for global layout
+                ['caseS', 'caseX', 'caseY', 'algW', 'algH', 'algX'].forEach(prop => {
+                    const el = document.getElementById('grid' + prop.charAt(0).toUpperCase() + prop.slice(1));
+                    if(el) {
+                        el.value = globalLayout[prop];
+                        const valEl = document.getElementById('valGrid' + prop.charAt(0).toUpperCase() + prop.slice(1));
+                        if(valEl) valEl.innerText = globalLayout[prop];
+                    }
+                });
+
+                if (parsed.cases && Array.isArray(parsed.cases)) {
+                    let loadedCount = 0;
+                    parsed.cases.forEach(item => {
+                        const img = new Image();
+                        img.onload = () => {
+                            casesData.push({
+                                img: img,
+                                name: item.name,
+                                enabled: item.enabled !== false,
+                                category: item.category || 'General',
+                                dataUrl: item.dataUrl,
+                                cropCase: item.cropCase,
+                                cropAlg: item.cropAlg,
+                                extraObjs: item.extraObjs || [],
+                                freeBlock: item.freeBlock,
+                                layoutCase: item.layoutCase,
+                                layoutAlg: item.layoutAlg
+                            });
+                            loadedCount++;
+                            if (loadedCount === parsed.cases.length) {
+                                if (selectedIndex === null && casesData.length > 0) selectedIndex = 0;
+                                updateThumbnails();
+                                updateFineSlidersBounds();
+                                redrawAll();
+                            }
+                        };
+                        img.src = item.dataUrl;
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to load from localStorage:", e);
+            }
+        }
+
+        // Navigation Tabs
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active-page'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.page).classList.add('active-page');
+                redrawAll();
             });
-            imageUpload.value = '';
+        });
+
+        // Image Upload Handling
+        document.querySelectorAll('.imageUploadGlobal').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
+                
+                let loaded = 0;
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const dataUrl = event.target.result;
+                        const img = new Image();
+                        img.onload = () => {
+                            casesData.push({
+                                img: img,
+                                name: file.name,
+                                enabled: true,
+                                category: 'General',
+                                dataUrl: dataUrl,
+                                cropCase: { id: 'cropCase', type: 'crop', color: '#4CAF50', label: 'Case Extract', x: img.width * 0.04, y: img.height * 0.70, w: img.width * 0.18, h: img.width * 0.18 },
+                                cropAlg: { id: 'cropAlg', type: 'crop', color: '#2196F3', label: 'Alg Extract', x: 0, y: 0, w: img.width, h: img.height * 0.22 },
+                                extraObjs: [],
+                                freeBlock: { 
+                                    x: 80 + ((casesData.length % 2) * 540), 
+                                    y: 180 + (Math.floor(casesData.length / 2) * 140), 
+                                    w: 400, 
+                                    h: 120 
+                                },
+                                layoutCase: { x: globalLayout.caseX, y: globalLayout.caseY, w: globalLayout.caseS, h: globalLayout.caseS },
+                                layoutAlg: { x: globalLayout.algX, y: 25, w: globalLayout.algW, h: globalLayout.algH }
+                            });
+                            
+                            loaded++;
+                            if (loaded === files.length) {
+                                if (selectedIndex === null) selectedIndex = 0;
+                                updateThumbnails();
+                                updateFineSlidersBounds();
+                                saveToLocalStorage();
+                                redrawAll();
+                                showToast(`Successfully added ${files.length} image(s)!`);
+                            }
+                        };
+                        img.src = dataUrl;
+                    };
+                    reader.readAsDataURL(file);
+                });
+                e.target.value = '';
+            });
         });
 
         function updateThumbnails() {
-            thumbList.innerHTML = '';
-            caseCountDisplay.innerText = casesData.length;
+            document.querySelectorAll('.caseCount').forEach(el => el.innerText = casesData.length);
+            document.querySelectorAll('.renderThumbList').forEach(listEl => {
+                listEl.innerHTML = '';
+                if (casesData.length === 0) {
+                    listEl.innerHTML = '<div style="font-size: 11px; color: #777; text-align: center; padding: 10px;">Upload images to start.</div>';
+                    return;
+                }
 
-            if (casesData.length === 0) {
-                thumbList.innerHTML = '<div style="font-size: 12px; color: #777; text-align: center; padding: 10px;">No images uploaded yet.</div>';
-                return;
-            }
+                casesData.forEach((item, idx) => {
+                    if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+                        return; // Filter by search
+                    }
 
-            casesData.forEach((item, idx) => {
-                const div = document.createElement('div');
-                div.className = `thumb-item ${idx === selectedIndex ? 'active' : ''}`;
-                
-                const thumbCanvas = document.createElement('canvas');
-                thumbCanvas.width = 30;
-                thumbCanvas.height = 30;
-                const tCtx = thumbCanvas.getContext('2d');
-                tCtx.drawImage(item.img, 0, 0, thumbCanvas.width, thumbCanvas.height);
+                    const div = document.createElement('div');
+                    div.className = `thumb-item ${idx === selectedIndex ? 'active' : ''}`;
+                    
+                    const thumbCanvas = document.createElement('canvas');
+                    thumbCanvas.width = 26; thumbCanvas.height = 26;
+                    const tCtx = thumbCanvas.getContext('2d');
+                    tCtx.drawImage(item.img, 0, 0, 26, 26);
 
-                div.innerHTML = `
-                    <input type="checkbox" ${item.enabled ? 'checked' : ''} data-index="${idx}" class="toggle-case">
-                    <img src="${thumbCanvas.toDataURL()}">
-                    <span>${item.name}</span>
-                `;
+                    div.innerHTML = `
+                        <input type="checkbox" ${item.enabled ? 'checked' : ''} data-index="${idx}" style="cursor:pointer;" title="Enable/Disable case">
+                        <img src="${thumbCanvas.toDataURL()}">
+                        <span>${item.name}</span>
+                    `;
 
-                div.addEventListener('click', (e) => {
-                    if (e.target.tagName === 'INPUT') return;
-                    selectedIndex = idx;
-                    updateThumbnails();
-                    loadSettingsToSliders(selectedIndex);
+                    div.addEventListener('click', (e) => {
+                        if (e.target.tagName === 'INPUT') return;
+                        selectedIndex = idx;
+                        selectedFreeIndex = idx;
+                        activeFineObj = casesData[idx].cropCase;
+                        updateThumbnails();
+                        updateFineSlidersBounds();
+                        redrawAll();
+                    });
+
+                    div.querySelector('input').addEventListener('change', (e) => {
+                        casesData[idx].enabled = e.target.checked;
+                        saveToLocalStorage();
+                        redrawAll();
+                    });
+
+                    listEl.appendChild(div);
                 });
-
-                div.querySelector('.toggle-case').addEventListener('change', (e) => {
-                    casesData[idx].enabled = e.target.checked;
-                    drawSheet();
-                });
-
-                thumbList.appendChild(div);
             });
         }
 
-        reverseOrderBtn.addEventListener('click', () => {
-            if (casesData.length === 0) return;
-            casesData.reverse();
-            if (selectedIndex !== null) {
-                selectedIndex = casesData.length - 1 - selectedIndex;
-            }
+        // Search Filter
+        document.getElementById('searchFilter').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
             updateThumbnails();
-            drawSheet();
         });
 
-        function loadSettingsToSliders(idx) {
-            if (casesData[idx]) {
-                const c = casesData[idx];
-                sliderCaseX.value = Math.round(c.caseX * 100);
-                sliderCaseY.value = Math.round(c.caseY * 100);
-                sliderCaseSize.value = Math.round(c.caseSize * 100);
-                sliderAlgH.value = Math.round(c.algH * 100);
-                updateSliderLabels();
-            }
-        }
+        // --- Presets ---
+        document.getElementById('presetStandard').addEventListener('click', () => {
+            sheetProps.columns = 3;
+            sheetProps.marginTopY = 100;
+            sheetProps.marginRowX = 80;
+            sheetProps.rowGap = 25;
+            sheetProps.colGap = 20;
+            document.getElementById('columnLayout').value = 3;
+            document.getElementById('sheetMarginY').value = 100;
+            document.getElementById('valSheetMarginY').innerText = 100;
+            document.getElementById('sheetMarginX').value = 80;
+            document.getElementById('valSheetMarginX').innerText = 80;
+            document.getElementById('rowGap').value = 25;
+            document.getElementById('valRowGap').innerText = 25;
+            document.getElementById('colGap').value = 20;
+            document.getElementById('valColGap').innerText = 20;
+            saveToLocalStorage();
+            redrawAll();
+            showToast("Applied Standard 3-Column Preset");
+        });
 
-        function updateCurrentCaseFromSliders() {
-            if (selectedIndex !== null && casesData[selectedIndex]) {
-                casesData[selectedIndex].caseX = sliderCaseX.value / 100;
-                casesData[selectedIndex].caseY = sliderCaseY.value / 100;
-                casesData[selectedIndex].caseSize = sliderCaseSize.value / 100;
-                casesData[selectedIndex].algH = sliderAlgH.value / 100;
-                updateSliderLabels();
-                drawSheet();
-            }
-        }
+        document.getElementById('presetCompact').addEventListener('click', () => {
+            sheetProps.columns = 4;
+            sheetProps.marginTopY = 70;
+            sheetProps.marginRowX = 50;
+            sheetProps.rowGap = 15;
+            sheetProps.colGap = 15;
+            globalLayout.caseS = 70;
+            globalLayout.algW = 160;
+            globalLayout.algH = 50;
+            globalLayout.algX = 90;
+            document.getElementById('columnLayout').value = 4;
+            document.getElementById('sheetMarginY').value = 70;
+            document.getElementById('valSheetMarginY').innerText = 70;
+            document.getElementById('sheetMarginX').value = 50;
+            document.getElementById('valSheetMarginX').innerText = 50;
+            document.getElementById('rowGap').value = 15;
+            document.getElementById('valRowGap').innerText = 15;
+            document.getElementById('colGap').value = 15;
+            document.getElementById('valColGap').innerText = 15;
+            saveToLocalStorage();
+            redrawAll();
+            showToast("Applied Compact Grid Preset");
+        });
 
-        [sliderCaseX, sliderCaseY, sliderCaseSize, sliderAlgH].forEach(slider => {
-            slider.addEventListener('input', () => {
-                updateSliderLabels();
-                updateCurrentCaseFromSliders();
+        document.getElementById('presetSpacious').addEventListener('click', () => {
+            sheetProps.columns = 2;
+            sheetProps.marginTopY = 120;
+            sheetProps.marginRowX = 100;
+            sheetProps.rowGap = 40;
+            sheetProps.colGap = 35;
+            globalLayout.caseS = 120;
+            globalLayout.algW = 280;
+            globalLayout.algH = 80;
+            globalLayout.algX = 150;
+            document.getElementById('columnLayout').value = 2;
+            document.getElementById('sheetMarginY').value = 120;
+            document.getElementById('valSheetMarginY').innerText = 120;
+            document.getElementById('sheetMarginX').value = 100;
+            document.getElementById('valSheetMarginX').innerText = 100;
+            document.getElementById('rowGap').value = 40;
+            document.getElementById('valRowGap').innerText = 40;
+            document.getElementById('colGap').value = 35;
+            document.getElementById('valColGap').innerText = 35;
+            saveToLocalStorage();
+            redrawAll();
+            showToast("Applied Spacious Study Preset");
+        });
+
+        // --- Page 1 UI & OG Slider Hooks ---
+        document.getElementById('sheetTitle').addEventListener('input', (e) => {
+            sheetProps.title = e.target.value;
+            saveToLocalStorage();
+            redrawAll();
+        });
+
+        document.getElementById('sheetSubtitle').addEventListener('input', (e) => {
+            sheetProps.subtitle = e.target.value;
+            saveToLocalStorage();
+            redrawAll();
+        });
+
+        document.getElementById('columnLayout').addEventListener('change', (e) => {
+            sheetProps.columns = parseInt(e.target.value);
+            saveToLocalStorage();
+            redrawAll();
+        });
+
+        document.getElementById('sheetTheme').addEventListener('change', (e) => {
+            sheetProps.theme = e.target.value;
+            saveToLocalStorage();
+            redrawAll();
+        });
+
+        // OG Sliders Listeners
+        const ogSliders = [
+            { id: 'sheetMarginY', prop: 'marginTopY' },
+            { id: 'sheetMarginX', prop: 'marginRowX' },
+            { id: 'rowGap', prop: 'rowGap' },
+            { id: 'colGap', prop: 'colGap' }
+        ];
+
+        ogSliders.forEach(s => {
+            document.getElementById(s.id).addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                document.getElementById('val' + s.id.charAt(0).toUpperCase() + s.id.slice(1)).innerText = val;
+                sheetProps[s.prop] = val;
+                saveToLocalStorage();
+                redrawAll();
             });
         });
 
-        applyToAllBtn.addEventListener('click', () => {
-            if (selectedIndex === null || casesData.length === 0) return;
-            const template = casesData[selectedIndex];
-            casesData.forEach(item => {
-                item.caseX = template.caseX;
-                item.caseY = template.caseY;
-                item.caseSize = template.caseSize;
-                item.algH = template.algH;
+        const p1Sliders = [
+            { id: 'gridCaseS', prop: 'caseS' },
+            { id: 'gridCaseX', prop: 'caseX' },
+            { id: 'gridCaseY', prop: 'caseY' },
+            { id: 'gridAlgW', prop: 'algW' },
+            { id: 'gridAlgH', prop: 'algH' },
+            { id: 'gridAlgX', prop: 'algX' }
+        ];
+
+        p1Sliders.forEach(s => {
+            document.getElementById(s.id).addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                document.getElementById('val' + s.id.charAt(0).toUpperCase() + s.id.slice(1)).innerText = val;
+                globalLayout[s.prop] = val;
+                
+                casesData.forEach(c => {
+                    c.layoutCase.w = c.layoutCase.h = globalLayout.caseS;
+                    c.layoutCase.x = globalLayout.caseX;
+                    c.layoutCase.y = globalLayout.caseY;
+                    c.layoutAlg.w = globalLayout.algW;
+                    c.layoutAlg.h = globalLayout.algH;
+                    c.layoutAlg.x = globalLayout.algX;
+                });
+                saveToLocalStorage();
+                redrawAll();
             });
-            drawSheet();
-            alert('Settings applied to all cases!');
         });
 
-        sheetTitleInput.addEventListener('input', drawSheet);
+        document.getElementById('clearAllBtn').addEventListener('click', () => {
+            casesData = []; selectedIndex = null; selectedFreeIndex = null;
+            saveToLocalStorage();
+            updateThumbnails(); redrawAll();
+            showToast("Cleared all cases");
+        });
 
-        function drawSheet() {
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        document.getElementById('reverseOrderBtn').addEventListener('click', () => {
+            casesData.reverse();
+            saveToLocalStorage();
+            updateThumbnails(); redrawAll();
+            showToast("Reversed cases order");
+        });
 
-            ctx.fillStyle = '#000000';
-            ctx.font = 'bold 48px Arial';
+        // --- Page 2 Logic (Fine Tuning & Reordering) ---
+        function updateFineSlidersBounds() {
+            if (selectedIndex === null || !casesData[selectedIndex] || !activeFineObj) return;
+            const img = casesData[selectedIndex].img;
+            
+            document.getElementById('fineSliderX').max = img.width;
+            document.getElementById('fineSliderY').max = img.height;
+            document.getElementById('fineSliderW').max = img.width;
+            document.getElementById('fineSliderH').max = img.height;
+            
+            updateFineSliderValues();
+            document.getElementById('deleteFineItemBtn').disabled = (activeFineObj.id === 'cropCase' || activeFineObj.id === 'cropAlg');
+        }
+
+        function updateFineSliderValues() {
+            if (!activeFineObj) return;
+            document.getElementById('fineSliderX').value = activeFineObj.x;
+            document.getElementById('fineSliderY').value = activeFineObj.y;
+            document.getElementById('fineSliderW').value = activeFineObj.w;
+            document.getElementById('fineSliderH').value = activeFineObj.h;
+            
+            document.getElementById('valFineX').innerText = Math.round(activeFineObj.x);
+            document.getElementById('valFineY').innerText = Math.round(activeFineObj.y);
+            document.getElementById('valFineW').innerText = Math.round(activeFineObj.w);
+            document.getElementById('valFineH').innerText = Math.round(activeFineObj.h);
+        }
+
+        ['X', 'Y', 'W', 'H'].forEach(prop => {
+            document.getElementById('fineSlider' + prop).addEventListener('input', (e) => {
+                if(activeFineObj) {
+                    activeFineObj[prop.toLowerCase()] = parseFloat(e.target.value);
+                    document.getElementById('valFine' + prop).innerText = activeFineObj[prop.toLowerCase()];
+                    saveToLocalStorage();
+                    redrawAll();
+                }
+            });
+        });
+
+        document.getElementById('applyCropToAllBtn').addEventListener('click', () => {
+            if(selectedIndex === null) return;
+            const refCase = casesData[selectedIndex];
+            casesData.forEach(c => {
+                c.cropCase = JSON.parse(JSON.stringify(refCase.cropCase));
+                c.cropAlg = JSON.parse(JSON.stringify(refCase.cropAlg));
+            });
+            saveToLocalStorage();
+            showToast("Applied active crop box to all cases.");
+            redrawAll();
+        });
+
+        document.getElementById('addBoxBtn').addEventListener('click', () => {
+            if(selectedIndex === null) return;
+            const c = casesData[selectedIndex];
+            const newObj = { type: 'box', color: '#ffeb3b', x: c.img.width/4, y: c.img.height/4, w: c.img.width/4, h: c.img.height/4 };
+            c.extraObjs.push(newObj);
+            activeFineObj = newObj;
+            saveToLocalStorage();
+            updateFineSlidersBounds(); redrawAll();
+        });
+
+        document.getElementById('addTextBtn').addEventListener('click', () => {
+            if(selectedIndex === null) return;
+            const c = casesData[selectedIndex];
+            const newObj = { type: 'text', color: '#f44336', text: 'Custom Text', fontSize: 100, x: c.img.width/4, y: c.img.height/4, w: c.img.width/2, h: c.img.height/8 };
+            c.extraObjs.push(newObj);
+            activeFineObj = newObj;
+            saveToLocalStorage();
+            updateFineSlidersBounds(); redrawAll();
+        });
+
+        document.getElementById('deleteFineItemBtn').addEventListener('click', () => {
+            if(selectedIndex !== null && activeFineObj && activeFineObj.id !== 'cropCase' && activeFineObj.id !== 'cropAlg') {
+                const c = casesData[selectedIndex];
+                c.extraObjs = c.extraObjs.filter(o => o !== activeFineObj);
+                activeFineObj = c.cropCase;
+                saveToLocalStorage();
+                updateFineSlidersBounds(); redrawAll();
+            }
+        });
+
+        // Move Up / Move Down case reordering
+        document.getElementById('moveUpBtn').addEventListener('click', () => {
+            if (selectedIndex !== null && selectedIndex > 0) {
+                const temp = casesData[selectedIndex];
+                casesData[selectedIndex] = casesData[selectedIndex - 1];
+                casesData[selectedIndex - 1] = temp;
+                selectedIndex--;
+                saveToLocalStorage();
+                updateThumbnails();
+                redrawAll();
+                showToast("Moved case up");
+            }
+        });
+
+        document.getElementById('moveDownBtn').addEventListener('click', () => {
+            if (selectedIndex !== null && selectedIndex < casesData.length - 1) {
+                const temp = casesData[selectedIndex];
+                casesData[selectedIndex] = casesData[selectedIndex + 1];
+                casesData[selectedIndex + 1] = temp;
+                selectedIndex++;
+                saveToLocalStorage();
+                updateThumbnails();
+                redrawAll();
+                showToast("Moved case down");
+            }
+        });
+
+        const fineCanvas = document.getElementById('fineCanvas');
+        
+        function getHandles(b) {
+            return {
+                nw: { x: b.x, y: b.y },
+                ne: { x: b.x + b.w, y: b.y },
+                se: { x: b.x + b.w, y: b.y + b.h },
+                sw: { x: b.x, y: b.y + b.h }
+            };
+        }
+
+        fineCanvas.addEventListener('mousedown', (e) => {
+            if (selectedIndex === null) return;
+            const rect = fineCanvas.getBoundingClientRect();
+            const scaleX = fineCanvas.width / rect.width;
+            const scaleY = fineCanvas.height / rect.height;
+            const mx = (e.clientX - rect.left) * scaleX;
+            const my = (e.clientY - rect.top) * scaleY;
+
+            const imgX = (mx - fineOffsetX) / fineScale;
+            const imgY = (my - fineOffsetY) / fineScale;
+
+            const c = casesData[selectedIndex];
+            const allObjs = [c.cropCase, c.cropAlg, ...c.extraObjs];
+            
+            fineResizingHandle = null;
+            isDraggingFine = false;
+
+            if (activeFineObj) {
+                const handles = getHandles(activeFineObj);
+                for (let hKey in handles) {
+                    const h = handles[hKey];
+                    const hSizeImg = handleSize / fineScale;
+                    if (Math.abs(imgX - h.x) <= hSizeImg && Math.abs(imgY - h.y) <= hSizeImg) {
+                        fineResizingHandle = hKey;
+                        return;
+                    }
+                }
+            }
+
+            let hit = null;
+            for(let i = allObjs.length - 1; i >= 0; i--) {
+                const o = allObjs[i];
+                if(imgX >= o.x && imgX <= o.x + o.w && imgY >= o.y && imgY <= o.y + o.h) {
+                    hit = o; break;
+                }
+            }
+
+            if(hit) {
+                activeFineObj = hit;
+                isDraggingFine = true;
+                fineDragStartX = imgX - hit.x;
+                fineDragStartY = imgY - hit.y;
+                updateFineSlidersBounds();
+            } else {
+                activeFineObj = null;
+                document.getElementById('deleteFineItemBtn').disabled = true;
+            }
+            redrawAll();
+        });
+
+        fineCanvas.addEventListener('mousemove', (e) => {
+            if (!isDraggingFine && !fineResizingHandle) return;
+            const rect = fineCanvas.getBoundingClientRect();
+            const scaleX = fineCanvas.width / rect.width;
+            const scaleY = fineCanvas.height / rect.height;
+            const mx = (e.clientX - rect.left) * scaleX;
+            const my = (e.clientY - rect.top) * scaleY;
+            const imgX = (mx - fineOffsetX) / fineScale;
+            const imgY = (my - fineOffsetY) / fineScale;
+
+            if (fineResizingHandle && activeFineObj) {
+                let x2 = activeFineObj.x + activeFineObj.w;
+                let y2 = activeFineObj.y + activeFineObj.h;
+                if (fineResizingHandle.includes('w')) activeFineObj.x = imgX;
+                if (fineResizingHandle.includes('e')) x2 = imgX;
+                if (fineResizingHandle.includes('n')) activeFineObj.y = imgY;
+                if (fineResizingHandle.includes('s')) y2 = imgY;
+                activeFineObj.w = x2 - activeFineObj.x;
+                activeFineObj.h = y2 - activeFineObj.y;
+                if (activeFineObj.w < 10) activeFineObj.w = 10;
+                if (activeFineObj.h < 10) activeFineObj.h = 10;
+                updateFineSliderValues(); 
+                saveToLocalStorage();
+                redrawAll();
+            } else if (isDraggingFine && activeFineObj) {
+                activeFineObj.x = imgX - fineDragStartX;
+                activeFineObj.y = imgY - fineDragStartY;
+                updateFineSliderValues(); 
+                saveToLocalStorage();
+                redrawAll();
+            }
+        });
+
+        fineCanvas.addEventListener('dblclick', (e) => {
+            if(activeFineObj && activeFineObj.type === 'text') {
+                const nt = prompt("Edit Text:", activeFineObj.text);
+                if(nt !== null) { 
+                    activeFineObj.text = nt; 
+                    saveToLocalStorage();
+                    redrawAll(); 
+                }
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDraggingFine = false; fineResizingHandle = null;
+            activeFreeDragMode = null; freeResizingHandle = null;
+        });
+
+
+        // --- Page 3 Logic (Freeform / Block Layout) ---
+        const freeCanvas = document.getElementById('freeCanvas');
+
+        document.getElementById('syncBlockLayoutBtn').addEventListener('click', () => {
+            if (selectedFreeIndex !== null && casesData[selectedFreeIndex]) {
+                const ref = casesData[selectedFreeIndex];
+                casesData.forEach(c => {
+                    c.layoutCase = JSON.parse(JSON.stringify(ref.layoutCase));
+                    c.layoutAlg = JSON.parse(JSON.stringify(ref.layoutAlg));
+                    c.freeBlock.w = ref.freeBlock.w;
+                    c.freeBlock.h = ref.freeBlock.h;
+                });
+                saveToLocalStorage();
+                showToast("Applied internal mini-block layout to all cases.");
+                redrawAll();
+            }
+        });
+
+        document.getElementById('resetFreeformPositionsBtn').addEventListener('click', () => {
+            casesData.forEach((c, i) => {
+                c.freeBlock.x = 80 + ((i % 2) * 540);
+                c.freeBlock.y = 180 + (Math.floor(i / 2) * 140);
+            });
+            saveToLocalStorage();
+            redrawAll();
+            showToast("Auto-arranged freeform blocks");
+        });
+
+        freeCanvas.addEventListener('mousedown', (e) => {
+            const rect = freeCanvas.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) * (freeCanvas.width / rect.width);
+            const my = (e.clientY - rect.top) * (freeCanvas.height / rect.height);
+
+            freeResizingHandle = null;
+            activeFreeDragMode = null;
+
+            if (selectedFreeIndex !== null) {
+                const c = casesData[selectedFreeIndex];
+                
+                let hlC = getHandles({x: c.freeBlock.x + c.layoutCase.x, y: c.freeBlock.y + c.layoutCase.y, w: c.layoutCase.w, h: c.layoutCase.h});
+                for(let k in hlC) if(Math.abs(mx - hlC[k].x)<=handleSize && Math.abs(my - hlC[k].y)<=handleSize) { freeResizingHandle = {type:'layoutCase', handle:k}; return; }
+                
+                let hlA = getHandles({x: c.freeBlock.x + c.layoutAlg.x, y: c.freeBlock.y + c.layoutAlg.y, w: c.layoutAlg.w, h: c.layoutAlg.h});
+                for(let k in hlA) if(Math.abs(mx - hlA[k].x)<=handleSize && Math.abs(my - hlA[k].y)<=handleSize) { freeResizingHandle = {type:'layoutAlg', handle:k}; return; }
+                
+                let hlB = getHandles(c.freeBlock);
+                for(let k in hlB) if(Math.abs(mx - hlB[k].x)<=handleSize && Math.abs(my - hlB[k].y)<=handleSize) { freeResizingHandle = {type:'block', handle:k}; return; }
+            }
+
+            for(let i = casesData.length - 1; i >= 0; i--) {
+                const c = casesData[i];
+                if(!c.enabled) continue;
+
+                const bx = c.freeBlock.x, by = c.freeBlock.y;
+                if(mx >= bx+c.layoutCase.x && mx <= bx+c.layoutCase.x+c.layoutCase.w && my >= by+c.layoutCase.y && my <= by+c.layoutCase.y+c.layoutCase.h) {
+                    selectedFreeIndex = i; activeFreeDragMode = 'layoutCase'; 
+                    freeDragOffX = mx - (bx + c.layoutCase.x); freeDragOffY = my - (by + c.layoutCase.y);
+                    redrawAll(); return;
+                }
+                if(mx >= bx+c.layoutAlg.x && mx <= bx+c.layoutAlg.x+c.layoutAlg.w && my >= by+c.layoutAlg.y && my <= by+c.layoutAlg.y+c.layoutAlg.h) {
+                    selectedFreeIndex = i; activeFreeDragMode = 'layoutAlg'; 
+                    freeDragOffX = mx - (bx + c.layoutAlg.x); freeDragOffY = my - (by + c.layoutAlg.y);
+                    redrawAll(); return;
+                }
+                if(mx >= bx && mx <= bx+c.freeBlock.w && my >= by && my <= by+c.freeBlock.h) {
+                    selectedFreeIndex = i; activeFreeDragMode = 'block';
+                    freeDragOffX = mx - bx; freeDragOffY = my - by;
+                    redrawAll(); return;
+                }
+            }
+            selectedFreeIndex = null; redrawAll();
+        });
+
+        freeCanvas.addEventListener('mousemove', (e) => {
+            if(!activeFreeDragMode && !freeResizingHandle) return;
+            const rect = freeCanvas.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) * (freeCanvas.width / rect.width);
+            const my = (e.clientY - rect.top) * (freeCanvas.height / rect.height);
+            const c = casesData[selectedFreeIndex];
+
+            if(freeResizingHandle) {
+                let target = null, ox=0, oy=0;
+                if(freeResizingHandle.type === 'block') { target = c.freeBlock; }
+                else if(freeResizingHandle.type === 'layoutCase') { target = c.layoutCase; ox = c.freeBlock.x; oy = c.freeBlock.y; }
+                else if(freeResizingHandle.type === 'layoutAlg') { target = c.layoutAlg; ox = c.freeBlock.x; oy = c.freeBlock.y; }
+                
+                let x2 = target.x + ox + target.w;
+                let y2 = target.y + oy + target.h;
+                const h = freeResizingHandle.handle;
+                
+                if (h.includes('w')) target.x = mx - ox;
+                if (h.includes('e')) x2 = mx;
+                if (h.includes('n')) target.y = my - oy;
+                if (h.includes('s')) y2 = my;
+                
+                target.w = x2 - (target.x + ox);
+                target.h = y2 - (target.y + oy);
+                if(target.w < 20) target.w = 20; if(target.h < 20) target.h = 20;
+                saveToLocalStorage();
+                redrawAll();
+            } else if(activeFreeDragMode) {
+                if(activeFreeDragMode === 'block') {
+                    c.freeBlock.x = mx - freeDragOffX; c.freeBlock.y = my - freeDragOffY;
+                } else if(activeFreeDragMode === 'layoutCase') {
+                    c.layoutCase.x = mx - c.freeBlock.x - freeDragOffX; c.layoutCase.y = my - c.freeBlock.y - freeDragOffY;
+                } else if(activeFreeDragMode === 'layoutAlg') {
+                    c.layoutAlg.x = mx - c.freeBlock.x - freeDragOffX; c.layoutAlg.y = my - c.freeBlock.y - freeDragOffY;
+                }
+                saveToLocalStorage();
+                redrawAll();
+            }
+        });
+
+
+        // --- Rendering Engine with Theme Support ---
+        function getThemeColors(theme) {
+            switch(theme) {
+                case 'cream': return { bg: '#fdfbf7', text: '#2c221e', border: '#d3c5b4', blockBg: '#fffdf9' };
+                case 'dark': return { bg: '#121212', text: '#f0f0f0', border: '#333333', blockBg: '#1e1e1e' };
+                case 'blueprint': return { bg: '#0d233a', text: '#ffffff', border: '#1d3f66', blockBg: '#142c4c' };
+                default: return { bg: '#ffffff', text: '#000000', border: '#e0e0e0', blockBg: '#ffffff' };
+            }
+        }
+
+        function drawGridSheet(ctx) {
+            const colors = getThemeColors(sheetProps.theme);
+            ctx.fillStyle = colors.bg;
+            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+            // Draw Header
+            ctx.fillStyle = colors.text; 
+            ctx.font = 'bold 44px Arial'; 
             ctx.textAlign = 'center';
-            ctx.fillText(sheetTitleInput.value || 'PLL Sheet', canvas.width / 2, 90);
+            ctx.fillText(sheetProps.title, ctx.canvas.width / 2, sheetProps.marginTopY - 30);
+            
+            if (sheetProps.subtitle) {
+                ctx.font = '18px Arial';
+                ctx.fillStyle = sheetProps.theme === 'dark' ? '#aaaaaa' : '#666666';
+                ctx.fillText(sheetProps.subtitle, ctx.canvas.width / 2, sheetProps.marginTopY - 2);
+            }
 
-            ctx.strokeStyle = '#333333';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(80, 125);
-            ctx.lineTo(canvas.width - 80, 125);
+            ctx.strokeStyle = colors.border; ctx.lineWidth = 3;
+            ctx.beginPath(); 
+            ctx.moveTo(sheetProps.marginRowX, sheetProps.marginTopY + 15); 
+            ctx.lineTo(ctx.canvas.width - sheetProps.marginRowX, sheetProps.marginTopY + 15); 
             ctx.stroke();
 
             const activeCases = casesData.filter(c => c.enabled);
+            const cols = sheetProps.columns;
+            let marginX = sheetProps.marginRowX, startY = sheetProps.marginTopY + 45;
+            let colW = (ctx.canvas.width - (marginX * 2) - (cols - 1) * sheetProps.colGap) / cols;
+            let rowH = Math.max(globalLayout.caseS, globalLayout.algH) + Math.max(globalLayout.caseY, 25) + 15;
 
-            if (activeCases.length === 0) {
-                ctx.fillStyle = '#777777';
-                ctx.font = 'italic 30px Arial';
-                ctx.fillText('Upload screenshots and enable them to build your A4 sheet.', canvas.width / 2, 300);
-                downloadBtn.disabled = true;
+            activeCases.forEach((item, index) => {
+                let col = index % cols, row = Math.floor(index / cols);
+                let bx = marginX + (col * (colW + sheetProps.colGap)), by = startY + (row * (rowH + sheetProps.rowGap));
+
+                // Draw cell block background & border
+                ctx.fillStyle = colors.blockBg;
+                ctx.fillRect(bx, by, colW, rowH);
+                ctx.strokeStyle = colors.border; ctx.lineWidth = 1;
+                ctx.strokeRect(bx, by, colW, rowH);
+
+                // Draw Extracted Case
+                if(item.cropCase.w > 0 && item.cropCase.h > 0) {
+                    ctx.drawImage(item.img, item.cropCase.x, item.cropCase.y, item.cropCase.w, item.cropCase.h, 
+                                bx + item.layoutCase.x, by + item.layoutCase.y, item.layoutCase.w, item.layoutCase.h);
+                    ctx.strokeStyle = colors.border; ctx.lineWidth = 1;
+                    ctx.strokeRect(bx + item.layoutCase.x, by + item.layoutCase.y, item.layoutCase.w, item.layoutCase.h);
+                }
+
+                // Draw Extracted Alg
+                if(item.cropAlg.w > 0 && item.cropAlg.h > 0) {
+                    ctx.drawImage(item.img, item.cropAlg.x, item.cropAlg.y, item.cropAlg.w, item.cropAlg.h, 
+                                bx + item.layoutAlg.x, by + item.layoutAlg.y, item.layoutAlg.w, item.layoutAlg.h);
+                }
+            });
+        }
+
+        function drawFineSheet(ctx) {
+            ctx.fillStyle = '#222';
+            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+            if (selectedIndex === null || !casesData[selectedIndex]) {
+                ctx.fillStyle = '#888'; ctx.font = '24px Arial'; ctx.textAlign = 'center';
+                ctx.fillText('Select an image from the sidebar to start extracting', ctx.canvas.width/2, ctx.canvas.height/2);
                 return;
             }
 
-            let marginX = 80;
-            let usableWidth = canvas.width - (marginX * 2);
-            let colWidth = usableWidth / 2;
-            let rowHeight = 115; 
-            let startY = 170;
+            const item = casesData[selectedIndex];
+            const img = item.img;
 
-            activeCases.forEach((item, index) => {
-                let colIndex = index % 2; 
-                let rowIndex = Math.floor(index / 2);
+            fineScale = Math.min((ctx.canvas.width - 100) / img.width, (ctx.canvas.height - 100) / img.height);
+            fineOffsetX = (ctx.canvas.width - (img.width * fineScale)) / 2;
+            fineOffsetY = (ctx.canvas.height - (img.height * fineScale)) / 2;
 
-                let currentX = marginX + (colIndex * colWidth);
-                let currentY = startY + (rowIndex * rowHeight);
+            ctx.drawImage(img, fineOffsetX, fineOffsetY, img.width * fineScale, img.height * fineScale);
+            
+            ctx.strokeStyle = '#555'; ctx.lineWidth = 2;
+            ctx.strokeRect(fineOffsetX, fineOffsetY, img.width * fineScale, img.height * fineScale);
 
-                if (currentY + rowHeight > canvas.height - 80) {
-                    let oldData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    canvas.height += 500;
-                    ctx.putImageData(oldData, 0, 0);
+            const allObjs = [item.cropCase, item.cropAlg, ...item.extraObjs];
+            allObjs.forEach(obj => {
+                const cx = fineOffsetX + (obj.x * fineScale);
+                const cy = fineOffsetY + (obj.y * fineScale);
+                const cw = obj.w * fineScale;
+                const ch = obj.h * fineScale;
+                const isSelected = (activeFineObj === obj);
+
+                if (obj.type === 'crop' || obj.type === 'box') {
+                    ctx.strokeStyle = obj.color;
+                    ctx.lineWidth = isSelected ? 4 : 2;
+                    ctx.strokeRect(cx, cy, cw, ch);
+                    if(obj.label) {
+                        ctx.fillStyle = obj.color; ctx.font = 'bold 14px Arial'; ctx.textAlign = 'left';
+                        ctx.fillText(obj.label, cx, cy - 8);
+                    }
+                } else if (obj.type === 'text') {
+                    ctx.fillStyle = obj.color;
+                    ctx.font = `bold ${obj.fontSize * fineScale}px Arial`;
+                    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                    ctx.fillText(obj.text, cx, cy);
+                    if(isSelected) {
+                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.setLineDash([5,5]);
+                        ctx.strokeRect(cx, cy, cw, ch); ctx.setLineDash([]);
+                    }
                 }
 
-                const img = item.img;
-
-                let cropSize = img.width * item.caseSize;
-                let cropX = img.width * item.caseX;
-                let cropY = img.height * item.caseY;
-                let displaySize = 80;
-
-                ctx.drawImage(img, cropX, cropY, cropSize, cropSize, currentX, currentY, displaySize, displaySize);
-                
-                ctx.strokeStyle = '#cccccc';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(currentX, currentY, displaySize, displaySize);
-
-                let algX = 0;
-                let algY = 0;
-                let algW = img.width;
-                let algH = img.height * item.algH;
-
-                let algDestX = currentX + displaySize + 15;
-                let algDestW = colWidth - displaySize - 30;
-                let algDestH = 50;
-
-                ctx.drawImage(img, algX, algY, algW, algH, algDestX, currentY + 15, algDestW, algDestH);
+                if (isSelected) {
+                    const handles = getHandles({x:cx, y:cy, w:cw, h:ch});
+                    ctx.fillStyle = '#fff';
+                    for(let k in handles) {
+                        ctx.fillRect(handles[k].x - handleSize/2, handles[k].y - handleSize/2, handleSize, handleSize);
+                        ctx.strokeRect(handles[k].x - handleSize/2, handles[k].y - handleSize/2, handleSize, handleSize);
+                    }
+                }
             });
-
-            downloadBtn.disabled = false;
         }
 
-        downloadBtn.addEventListener('click', () => {
-            canvas.toBlob((blob) => {
+        function drawFreeformSheet(ctx) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+            casesData.forEach((item, index) => {
+                if(!item.enabled) return;
+                const bx = item.freeBlock.x, by = item.freeBlock.y;
+                const bw = item.freeBlock.w, bh = item.freeBlock.h;
+                const isSel = (index === selectedFreeIndex);
+
+                ctx.fillStyle = isSel ? '#f4f9ff' : '#fcfcfc';
+                ctx.fillRect(bx, by, bw, bh);
+                ctx.strokeStyle = isSel ? '#2196F3' : '#ddd';
+                ctx.lineWidth = isSel ? 3 : 1;
+                ctx.strokeRect(bx, by, bw, bh);
+
+                ctx.drawImage(item.img, item.cropCase.x, item.cropCase.y, item.cropCase.w, item.cropCase.h, 
+                            bx + item.layoutCase.x, by + item.layoutCase.y, item.layoutCase.w, item.layoutCase.h);
+                if(isSel) {
+                    ctx.strokeStyle = '#4CAF50'; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+                    ctx.strokeRect(bx + item.layoutCase.x, by + item.layoutCase.y, item.layoutCase.w, item.layoutCase.h);
+                }
+
+                ctx.drawImage(item.img, item.cropAlg.x, item.cropAlg.y, item.cropAlg.w, item.cropAlg.h, 
+                            bx + item.layoutAlg.x, by + item.layoutAlg.y, item.layoutAlg.w, item.layoutAlg.h);
+                if(isSel) {
+                    ctx.strokeStyle = '#FF9800'; ctx.lineWidth = 1;
+                    ctx.strokeRect(bx + item.layoutAlg.x, by + item.layoutAlg.y, item.layoutAlg.w, item.layoutAlg.h);
+                    ctx.setLineDash([]);
+                }
+
+                if(isSel) {
+                    let tgts = [
+                        {o: item.freeBlock, ox:0, oy:0, col:'#2196F3'},
+                        {o: item.layoutCase, ox:bx, oy:by, col:'#4CAF50'},
+                        {o: item.layoutAlg, ox:bx, oy:by, col:'#FF9800'}
+                    ];
+                    tgts.forEach(t => {
+                        const hdls = getHandles({x: t.o.x + t.ox, y: t.o.y + t.oy, w: t.o.w, h: t.o.h});
+                        ctx.fillStyle = t.col;
+                        for(let k in hdls) ctx.fillRect(hdls[k].x - handleSize/2, hdls[k].y - handleSize/2, handleSize, handleSize);
+                    });
+                }
+            });
+        }
+
+        function redrawAll() {
+            if(document.getElementById('gridPage').classList.contains('active-page')) drawGridSheet(document.getElementById('gridCanvas').getContext('2d'));
+            if(document.getElementById('fineTunePage').classList.contains('active-page')) drawFineSheet(document.getElementById('fineCanvas').getContext('2d'));
+            if(document.getElementById('freeformPage').classList.contains('active-page')) drawFreeformSheet(document.getElementById('freeCanvas').getContext('2d'));
+        }
+
+        // --- JSON Project Export / Import ---
+        document.getElementById('exportProjectBtn').addEventListener('click', () => {
+            const saveData = {
+                sheetProps,
+                globalLayout,
+                cases: casesData.map(c => ({
+                    name: c.name,
+                    enabled: c.enabled,
+                    category: c.category || 'General',
+                    dataUrl: c.dataUrl,
+                    cropCase: c.cropCase,
+                    cropAlg: c.cropAlg,
+                    extraObjs: c.extraObjs,
+                    freeBlock: c.freeBlock,
+                    layoutCase: c.layoutCase,
+                    layoutAlg: c.layoutAlg
+                }))
+            };
+            const blob = new Blob([JSON.stringify(saveData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'PLL-Studio-Project.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("Project exported successfully as JSON");
+        });
+
+        document.getElementById('importProjectBtn').addEventListener('click', () => {
+            document.getElementById('importFile').click();
+        });
+
+        document.getElementById('importFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const parsed = JSON.parse(event.target.result);
+                    if (parsed.sheetProps) sheetProps = { ...sheetProps, ...parsed.sheetProps };
+                    if (parsed.globalLayout) globalLayout = { ...globalLayout, ...parsed.globalLayout };
+                    
+                    if (parsed.cases && Array.isArray(parsed.cases)) {
+                        casesData = [];
+                        let loadedCount = 0;
+                        parsed.cases.forEach(item => {
+                            const img = new Image();
+                            img.onload = () => {
+                                casesData.push({
+                                    img: img,
+                                    name: item.name,
+                                    enabled: item.enabled !== false,
+                                    category: item.category || 'General',
+                                    dataUrl: item.dataUrl,
+                                    cropCase: item.cropCase,
+                                    cropAlg: item.cropAlg,
+                                    extraObjs: item.extraObjs || [],
+                                    freeBlock: item.freeBlock,
+                                    layoutCase: item.layoutCase,
+                                    layoutAlg: item.layoutAlg
+                                });
+                                loadedCount++;
+                                if (loadedCount === parsed.cases.length) {
+                                    if (casesData.length > 0) selectedIndex = 0;
+                                    updateThumbnails();
+                                    updateFineSlidersBounds();
+                                    saveToLocalStorage();
+                                    redrawAll();
+                                    showToast("Project imported successfully!");
+                                }
+                            };
+                            img.src = item.dataUrl;
+                        });
+                    }
+                } catch (err) {
+                    console.error("Invalid JSON project file", err);
+                    showToast("Error importing project JSON file.");
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        });
+
+        // Global High-Res PNG Export
+        document.getElementById('globalDownloadBtn').addEventListener('click', () => {
+            const activePage = document.querySelector('.page-view.active-page');
+            const activeCanvas = activePage.querySelector('canvas');
+            activeCanvas.toBlob((blob) => {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'PLL-Sheet.png';
+                a.download = 'PLL-Master-Sheet.png';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-            }, 'image/png');
+                showToast("High-Res PNG sheet exported!");
+            }, 'image/png', 1.0);
         });
 
-        updateSliderLabels();
-        drawSheet();
+        // Initialize on startup by loading from localStorage
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromLocalStorage();
+            redrawAll();
+        });
     </script>
 </body>
 </html>
