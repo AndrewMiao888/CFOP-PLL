@@ -481,6 +481,7 @@
         // Data Architecture
         let casesData = [];
         let selectedIndex = null;
+        let selectedFreeIndex = null;
         let searchQuery = "";
         
         // Page 1 Global Layout & OG Sliders Settings
@@ -513,7 +514,6 @@
         let fineDragStartX = 0, fineDragStartY = 0;
 
         // Page 3 State
-        let selectedFreeIndex = null;
         let activeFreeDragMode = null;
         let freeDragOffX = 0, freeDragOffY = 0;
         let freeResizingHandle = null;
@@ -532,10 +532,20 @@
             }, duration);
         }
 
+        // Helper to ensure item has all required properties
+        function ensureCaseProperties(item, img, index = 0) {
+            if (!item.cropCase) item.cropCase = { id: 'cropCase', type: 'crop', color: '#4CAF50', label: 'Case Extract', x: img.width * 0.04, y: img.height * 0.70, w: img.width * 0.18, h: img.width * 0.18 };
+            if (!item.cropAlg) item.cropAlg = { id: 'cropAlg', type: 'crop', color: '#2196F3', label: 'Alg Extract', x: 0, y: 0, w: img.width, h: img.height * 0.22 };
+            if (!item.extraObjs) item.extraObjs = [];
+            if (!item.freeBlock) item.freeBlock = { x: 80 + ((index % 2) * 540), y: 180 + (Math.floor(index / 2) * 140), w: 400, h: 120 };
+            if (!item.layoutCase) item.layoutCase = { x: globalLayout.caseX, y: globalLayout.caseY, w: globalLayout.caseS, h: globalLayout.caseS };
+            if (!item.layoutAlg) item.layoutAlg = { x: globalLayout.algX, y: 25, w: globalLayout.algW, h: globalLayout.algH };
+            if (item.enabled === undefined) item.enabled = true;
+        }
+
         // --- LocalStorage Persistence ---
         function saveToLocalStorage() {
             try {
-                // We serialize casesData by converting images to base64 data URLs
                 const saveData = {
                     sheetProps,
                     globalLayout,
@@ -592,25 +602,19 @@
 
                 if (parsed.cases && Array.isArray(parsed.cases)) {
                     let loadedCount = 0;
-                    parsed.cases.forEach(item => {
+                    parsed.cases.forEach((item, index) => {
                         const img = new Image();
                         img.onload = () => {
-                            casesData.push({
-                                img: img,
-                                name: item.name,
-                                enabled: item.enabled !== false,
-                                category: item.category || 'General',
-                                dataUrl: item.dataUrl,
-                                cropCase: item.cropCase,
-                                cropAlg: item.cropAlg,
-                                extraObjs: item.extraObjs || [],
-                                freeBlock: item.freeBlock,
-                                layoutCase: item.layoutCase,
-                                layoutAlg: item.layoutAlg
-                            });
+                            ensureCaseProperties(item, img, index);
+                            item.img = img;
+                            casesData.push(item);
                             loadedCount++;
                             if (loadedCount === parsed.cases.length) {
-                                if (selectedIndex === null && casesData.length > 0) selectedIndex = 0;
+                                if (selectedIndex === null && casesData.length > 0) {
+                                    selectedIndex = 0;
+                                    selectedFreeIndex = 0;
+                                    activeFineObj = casesData[0].cropCase;
+                                }
                                 updateThumbnails();
                                 updateFineSlidersBounds();
                                 redrawAll();
@@ -631,6 +635,10 @@
                 document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active-page'));
                 tab.classList.add('active');
                 document.getElementById(tab.dataset.page).classList.add('active-page');
+                if (tab.dataset.page === 'fineTunePage' && selectedIndex !== null && casesData[selectedIndex] && !activeFineObj) {
+                    activeFineObj = casesData[selectedIndex].cropCase;
+                    updateFineSlidersBounds();
+                }
                 redrawAll();
             });
         });
@@ -648,7 +656,7 @@
                         const dataUrl = event.target.result;
                         const img = new Image();
                         img.onload = () => {
-                            casesData.push({
+                            const newCase = {
                                 img: img,
                                 name: file.name,
                                 enabled: true,
@@ -665,11 +673,16 @@
                                 },
                                 layoutCase: { x: globalLayout.caseX, y: globalLayout.caseY, w: globalLayout.caseS, h: globalLayout.caseS },
                                 layoutAlg: { x: globalLayout.algX, y: 25, w: globalLayout.algW, h: globalLayout.algH }
-                            });
+                            };
+                            casesData.push(newCase);
                             
                             loaded++;
                             if (loaded === files.length) {
-                                if (selectedIndex === null) selectedIndex = 0;
+                                if (selectedIndex === null) {
+                                    selectedIndex = 0;
+                                    selectedFreeIndex = 0;
+                                    activeFineObj = casesData[0].cropCase;
+                                }
                                 updateThumbnails();
                                 updateFineSlidersBounds();
                                 saveToLocalStorage();
@@ -696,7 +709,7 @@
 
                 casesData.forEach((item, idx) => {
                     if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-                        return; // Filter by search
+                        return;
                     }
 
                     const div = document.createElement('div');
@@ -881,7 +894,7 @@
         });
 
         document.getElementById('clearAllBtn').addEventListener('click', () => {
-            casesData = []; selectedIndex = null; selectedFreeIndex = null;
+            casesData = []; selectedIndex = null; selectedFreeIndex = null; activeFineObj = null;
             saveToLocalStorage();
             updateThumbnails(); redrawAll();
             showToast("Cleared all cases");
@@ -933,7 +946,7 @@
         });
 
         document.getElementById('applyCropToAllBtn').addEventListener('click', () => {
-            if(selectedIndex === null) return;
+            if(selectedIndex === null || !casesData[selectedIndex]) return;
             const refCase = casesData[selectedIndex];
             casesData.forEach(c => {
                 c.cropCase = JSON.parse(JSON.stringify(refCase.cropCase));
@@ -945,7 +958,7 @@
         });
 
         document.getElementById('addBoxBtn').addEventListener('click', () => {
-            if(selectedIndex === null) return;
+            if(selectedIndex === null || !casesData[selectedIndex]) return;
             const c = casesData[selectedIndex];
             const newObj = { type: 'box', color: '#ffeb3b', x: c.img.width/4, y: c.img.height/4, w: c.img.width/4, h: c.img.height/4 };
             c.extraObjs.push(newObj);
@@ -955,7 +968,7 @@
         });
 
         document.getElementById('addTextBtn').addEventListener('click', () => {
-            if(selectedIndex === null) return;
+            if(selectedIndex === null || !casesData[selectedIndex]) return;
             const c = casesData[selectedIndex];
             const newObj = { type: 'text', color: '#f44336', text: 'Custom Text', fontSize: 100, x: c.img.width/4, y: c.img.height/4, w: c.img.width/2, h: c.img.height/8 };
             c.extraObjs.push(newObj);
@@ -965,7 +978,7 @@
         });
 
         document.getElementById('deleteFineItemBtn').addEventListener('click', () => {
-            if(selectedIndex !== null && activeFineObj && activeFineObj.id !== 'cropCase' && activeFineObj.id !== 'cropAlg') {
+            if(selectedIndex !== null && casesData[selectedIndex] && activeFineObj && activeFineObj.id !== 'cropCase' && activeFineObj.id !== 'cropAlg') {
                 const c = casesData[selectedIndex];
                 c.extraObjs = c.extraObjs.filter(o => o !== activeFineObj);
                 activeFineObj = c.cropCase;
@@ -974,13 +987,13 @@
             }
         });
 
-        // Move Up / Move Down case reordering
         document.getElementById('moveUpBtn').addEventListener('click', () => {
             if (selectedIndex !== null && selectedIndex > 0) {
                 const temp = casesData[selectedIndex];
                 casesData[selectedIndex] = casesData[selectedIndex - 1];
                 casesData[selectedIndex - 1] = temp;
                 selectedIndex--;
+                selectedFreeIndex = selectedIndex;
                 saveToLocalStorage();
                 updateThumbnails();
                 redrawAll();
@@ -994,6 +1007,7 @@
                 casesData[selectedIndex] = casesData[selectedIndex + 1];
                 casesData[selectedIndex + 1] = temp;
                 selectedIndex++;
+                selectedFreeIndex = selectedIndex;
                 saveToLocalStorage();
                 updateThumbnails();
                 redrawAll();
@@ -1013,7 +1027,10 @@
         }
 
         fineCanvas.addEventListener('mousedown', (e) => {
-            if (selectedIndex === null) return;
+            if (selectedIndex === null || !casesData[selectedIndex]) return;
+            const c = casesData[selectedIndex];
+            if (!activeFineObj) activeFineObj = c.cropCase;
+
             const rect = fineCanvas.getBoundingClientRect();
             const scaleX = fineCanvas.width / rect.width;
             const scaleY = fineCanvas.height / rect.height;
@@ -1023,7 +1040,6 @@
             const imgX = (mx - fineOffsetX) / fineScale;
             const imgY = (my - fineOffsetY) / fineScale;
 
-            const c = casesData[selectedIndex];
             const allObjs = [c.cropCase, c.cropAlg, ...c.extraObjs];
             
             fineResizingHandle = null;
@@ -1063,7 +1079,7 @@
         });
 
         fineCanvas.addEventListener('mousemove', (e) => {
-            if (!isDraggingFine && !fineResizingHandle) return;
+            if ((!isDraggingFine && !fineResizingHandle) || selectedIndex === null || !casesData[selectedIndex]) return;
             const rect = fineCanvas.getBoundingClientRect();
             const scaleX = fineCanvas.width / rect.width;
             const scaleY = fineCanvas.height / rect.height;
@@ -1148,7 +1164,7 @@
             freeResizingHandle = null;
             activeFreeDragMode = null;
 
-            if (selectedFreeIndex !== null) {
+            if (selectedFreeIndex !== null && casesData[selectedFreeIndex]) {
                 const c = casesData[selectedFreeIndex];
                 
                 let hlC = getHandles({x: c.freeBlock.x + c.layoutCase.x, y: c.freeBlock.y + c.layoutCase.y, w: c.layoutCase.w, h: c.layoutCase.h});
@@ -1167,26 +1183,26 @@
 
                 const bx = c.freeBlock.x, by = c.freeBlock.y;
                 if(mx >= bx+c.layoutCase.x && mx <= bx+c.layoutCase.x+c.layoutCase.w && my >= by+c.layoutCase.y && my <= by+c.layoutCase.y+c.layoutCase.h) {
-                    selectedFreeIndex = i; activeFreeDragMode = 'layoutCase'; 
+                    selectedFreeIndex = i; selectedIndex = i; activeFreeDragMode = 'layoutCase'; 
                     freeDragOffX = mx - (bx + c.layoutCase.x); freeDragOffY = my - (by + c.layoutCase.y);
-                    redrawAll(); return;
+                    updateThumbnails(); redrawAll(); return;
                 }
                 if(mx >= bx+c.layoutAlg.x && mx <= bx+c.layoutAlg.x+c.layoutAlg.w && my >= by+c.layoutAlg.y && my <= by+c.layoutAlg.y+c.layoutAlg.h) {
-                    selectedFreeIndex = i; activeFreeDragMode = 'layoutAlg'; 
+                    selectedFreeIndex = i; selectedIndex = i; activeFreeDragMode = 'layoutAlg'; 
                     freeDragOffX = mx - (bx + c.layoutAlg.x); freeDragOffY = my - (by + c.layoutAlg.y);
-                    redrawAll(); return;
+                    updateThumbnails(); redrawAll(); return;
                 }
                 if(mx >= bx && mx <= bx+c.freeBlock.w && my >= by && my <= by+c.freeBlock.h) {
-                    selectedFreeIndex = i; activeFreeDragMode = 'block';
+                    selectedFreeIndex = i; selectedIndex = i; activeFreeDragMode = 'block';
                     freeDragOffX = mx - bx; freeDragOffY = my - by;
-                    redrawAll(); return;
+                    updateThumbnails(); redrawAll(); return;
                 }
             }
             selectedFreeIndex = null; redrawAll();
         });
 
         freeCanvas.addEventListener('mousemove', (e) => {
-            if(!activeFreeDragMode && !freeResizingHandle) return;
+            if((!activeFreeDragMode && !freeResizingHandle) || selectedFreeIndex === null || !casesData[selectedFreeIndex]) return;
             const rect = freeCanvas.getBoundingClientRect();
             const mx = (e.clientX - rect.left) * (freeCanvas.width / rect.width);
             const my = (e.clientY - rect.top) * (freeCanvas.height / rect.height);
@@ -1225,6 +1241,28 @@
             }
         });
 
+
+        // --- Aspect Ratio Preserving Image Draw Function (No Squishing!) ---
+        function drawImageAspectFit(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) {
+            if (!sw || !sh || !dw || !dh) return;
+            const srcAspect = sw / sh;
+            const dstAspect = dw / dh;
+            
+            let drawW = dw;
+            let drawH = dh;
+            let offsetX = 0;
+            let offsetY = 0;
+            
+            if (srcAspect > dstAspect) {
+                drawH = dw / srcAspect;
+                offsetY = (dh - drawH) / 2;
+            } else {
+                drawW = dh * srcAspect;
+                offsetX = (dw - drawW) / 2;
+            }
+            
+            ctx.drawImage(img, sx, sy, sw, sh, dx + offsetX, dy + offsetY, drawW, drawH);
+        }
 
         // --- Rendering Engine with Theme Support ---
         function getThemeColors(theme) {
@@ -1275,17 +1313,17 @@
                 ctx.strokeStyle = colors.border; ctx.lineWidth = 1;
                 ctx.strokeRect(bx, by, colW, rowH);
 
-                // Draw Extracted Case
+                // Draw Extracted Case (Aspect Fit - No Squishing)
                 if(item.cropCase.w > 0 && item.cropCase.h > 0) {
-                    ctx.drawImage(item.img, item.cropCase.x, item.cropCase.y, item.cropCase.w, item.cropCase.h, 
+                    drawImageAspectFit(ctx, item.img, item.cropCase.x, item.cropCase.y, item.cropCase.w, item.cropCase.h, 
                                 bx + item.layoutCase.x, by + item.layoutCase.y, item.layoutCase.w, item.layoutCase.h);
                     ctx.strokeStyle = colors.border; ctx.lineWidth = 1;
                     ctx.strokeRect(bx + item.layoutCase.x, by + item.layoutCase.y, item.layoutCase.w, item.layoutCase.h);
                 }
 
-                // Draw Extracted Alg
+                // Draw Extracted Alg (Aspect Fit - No Squishing)
                 if(item.cropAlg.w > 0 && item.cropAlg.h > 0) {
-                    ctx.drawImage(item.img, item.cropAlg.x, item.cropAlg.y, item.cropAlg.w, item.cropAlg.h, 
+                    drawImageAspectFit(ctx, item.img, item.cropAlg.x, item.cropAlg.y, item.cropAlg.w, item.cropAlg.h, 
                                 bx + item.layoutAlg.x, by + item.layoutAlg.y, item.layoutAlg.w, item.layoutAlg.h);
                 }
             });
@@ -1367,14 +1405,16 @@
                 ctx.lineWidth = isSel ? 3 : 1;
                 ctx.strokeRect(bx, by, bw, bh);
 
-                ctx.drawImage(item.img, item.cropCase.x, item.cropCase.y, item.cropCase.w, item.cropCase.h, 
+                // Aspect Fit (No Squishing)
+                drawImageAspectFit(ctx, item.img, item.cropCase.x, item.cropCase.y, item.cropCase.w, item.cropCase.h, 
                             bx + item.layoutCase.x, by + item.layoutCase.y, item.layoutCase.w, item.layoutCase.h);
                 if(isSel) {
                     ctx.strokeStyle = '#4CAF50'; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
                     ctx.strokeRect(bx + item.layoutCase.x, by + item.layoutCase.y, item.layoutCase.w, item.layoutCase.h);
                 }
 
-                ctx.drawImage(item.img, item.cropAlg.x, item.cropAlg.y, item.cropAlg.w, item.cropAlg.h, 
+                // Aspect Fit (No Squishing)
+                drawImageAspectFit(ctx, item.img, item.cropAlg.x, item.cropAlg.y, item.cropAlg.w, item.cropAlg.h, 
                             bx + item.layoutAlg.x, by + item.layoutAlg.y, item.layoutAlg.w, item.layoutAlg.h);
                 if(isSel) {
                     ctx.strokeStyle = '#FF9800'; ctx.lineWidth = 1;
@@ -1450,25 +1490,19 @@
                     if (parsed.cases && Array.isArray(parsed.cases)) {
                         casesData = [];
                         let loadedCount = 0;
-                        parsed.cases.forEach(item => {
+                        parsed.cases.forEach((item, index) => {
                             const img = new Image();
                             img.onload = () => {
-                                casesData.push({
-                                    img: img,
-                                    name: item.name,
-                                    enabled: item.enabled !== false,
-                                    category: item.category || 'General',
-                                    dataUrl: item.dataUrl,
-                                    cropCase: item.cropCase,
-                                    cropAlg: item.cropAlg,
-                                    extraObjs: item.extraObjs || [],
-                                    freeBlock: item.freeBlock,
-                                    layoutCase: item.layoutCase,
-                                    layoutAlg: item.layoutAlg
-                                });
+                                ensureCaseProperties(item, img, index);
+                                item.img = img;
+                                casesData.push(item);
                                 loadedCount++;
                                 if (loadedCount === parsed.cases.length) {
-                                    if (casesData.length > 0) selectedIndex = 0;
+                                    if (casesData.length > 0) {
+                                        selectedIndex = 0;
+                                        selectedFreeIndex = 0;
+                                        activeFineObj = casesData[0].cropCase;
+                                    }
                                     updateThumbnails();
                                     updateFineSlidersBounds();
                                     saveToLocalStorage();
