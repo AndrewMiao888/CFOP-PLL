@@ -25,7 +25,6 @@
             overflow: hidden;
         }
 
-        /* Sidebar Control Panel (Mini-Canva style) */
         sidebar {
             width: 350px;
             background: var(--panel-bg);
@@ -111,10 +110,9 @@
 
         .btn:hover { background-color: var(--accent-hover); }
         .btn:disabled { background-color: #555; cursor: not-allowed; }
-        .btn-secondary { background-color: #444; margin-top: 5px; }
+        .btn-secondary { background-color: #444; margin-top: 5px; width: 100%; }
         .btn-secondary:hover { background-color: #555; }
 
-        /* Thumbnails Manager */
         .thumb-list {
             display: flex;
             flex-direction: column;
@@ -153,7 +151,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Main Preview Canvas Area */
         main {
             flex-grow: 1;
             background: #181818;
@@ -174,7 +171,6 @@
 </head>
 <body>
 
-    <!-- SIDEBAR EDITOR (Mini-Canva UI) -->
     <sidebar>
         <div class="sidebar-header">
             <h2>PLL Sheet Studio</h2>
@@ -182,22 +178,20 @@
         </div>
 
         <div class="sidebar-content">
-            <!-- Sheet Settings -->
             <div class="section-group">
                 <h3>Sheet Settings</h3>
                 <label>Sheet Title</label>
                 <input type="text" id="sheetTitle" value="PLL Algorithms Cheat Sheet">
             </div>
 
-            <!-- Uploaded Cases Manager -->
             <div class="section-group">
                 <h3>Cases Manager (<span id="caseCount">0</span>)</h3>
+                <button class="btn btn-secondary" id="reverseOrderBtn" style="margin-bottom: 10px;">Reverse Order</button>
                 <div class="thumb-list" id="thumbList">
                     <div style="font-size: 12px; color: #777; text-align: center; padding: 10px;">No images uploaded yet.</div>
                 </div>
             </div>
 
-            <!-- Crop & Layout Adjuster -->
             <div class="section-group">
                 <h3>Crop Fine-Tuning</h3>
                 
@@ -218,12 +212,10 @@
                 <button class="btn btn-secondary" id="applyToAllBtn">Apply Settings to All Cases</button>
             </div>
 
-            <!-- Download Action -->
             <button class="btn" id="downloadBtn" disabled>Download A4 Sheet</button>
         </div>
     </sidebar>
 
-    <!-- PREVIEW AREA -->
     <main>
         <canvas id="sheetCanvas" width="1240" height="1754"></canvas>
     </main>
@@ -237,17 +229,16 @@
         const thumbList = document.getElementById('thumbList');
         const caseCountDisplay = document.getElementById('caseCount');
         const applyToAllBtn = document.getElementById('applyToAllBtn');
+        const reverseOrderBtn = document.getElementById('reverseOrderBtn');
 
-        // UI Sliders
         const sliderCaseX = document.getElementById('caseX');
         const sliderCaseY = document.getElementById('caseY');
         const sliderCaseSize = document.getElementById('caseSize');
         const sliderAlgH = document.getElementById('algH');
 
-        let casesData = []; // Array storing image objects and individual crop parameters
-        let selectedIndex = null; // Currently selected image for fine-tuning
+        let casesData = [];
+        let selectedIndex = null;
 
-        // Update slider percentage text labels live
         function updateSliderLabels() {
             document.getElementById('val-caseX').innerText = sliderCaseX.value;
             document.getElementById('val-caseY').innerText = sliderCaseY.value;
@@ -255,7 +246,6 @@
             document.getElementById('val-algH').innerText = sliderAlgH.value;
         }
 
-        // Handle file uploads
         imageUpload.addEventListener('change', (e) => {
             const files = Array.from(e.target.files);
             if (files.length === 0) return;
@@ -270,7 +260,6 @@
                             img: img,
                             name: file.name,
                             enabled: true,
-                            // Default precise crop ratios
                             caseX: 0.04,
                             caseY: 0.74,
                             caseSize: 0.15,
@@ -288,10 +277,9 @@
                 };
                 reader.readAsDataURL(file);
             });
-            imageUpload.value = ''; // Reset input
+            imageUpload.value = '';
         });
 
-        // Update thumbnail sidebar list
         function updateThumbnails() {
             thumbList.innerHTML = '';
             caseCountDisplay.innerText = casesData.length;
@@ -305,7 +293,6 @@
                 const div = document.createElement('div');
                 div.className = `thumb-item ${idx === selectedIndex ? 'active' : ''}`;
                 
-                // Create mini preview canvas for thumbnail
                 const thumbCanvas = document.createElement('canvas');
                 thumbCanvas.width = 30;
                 thumbCanvas.height = 30;
@@ -318,15 +305,13 @@
                     <span>${item.name}</span>
                 `;
 
-                // Click thumbnail to select for editing
                 div.addEventListener('click', (e) => {
-                    if (e.target.tagName === 'INPUT') return; // Don't trigger selection when clicking checkbox
+                    if (e.target.tagName === 'INPUT') return;
                     selectedIndex = idx;
                     updateThumbnails();
                     loadSettingsToSliders(selectedIndex);
                 });
 
-                // Toggle visibility checkbox
                 div.querySelector('.toggle-case').addEventListener('change', (e) => {
                     casesData[idx].enabled = e.target.checked;
                     drawSheet();
@@ -336,7 +321,16 @@
             });
         }
 
-        // Load specific case settings into sidebar controls
+        reverseOrderBtn.addEventListener('click', () => {
+            if (casesData.length === 0) return;
+            casesData.reverse();
+            if (selectedIndex !== null) {
+                selectedIndex = casesData.length - 1 - selectedIndex;
+            }
+            updateThumbnails();
+            drawSheet();
+        });
+
         function loadSettingsToSliders(idx) {
             if (casesData[idx]) {
                 const c = casesData[idx];
@@ -348,7 +342,6 @@
             }
         }
 
-        // Save slider values to currently selected item
         function updateCurrentCaseFromSliders() {
             if (selectedIndex !== null && casesData[selectedIndex]) {
                 casesData[selectedIndex].caseX = sliderCaseX.value / 100;
@@ -360,7 +353,6 @@
             }
         }
 
-        // Event listeners for sliders
         [sliderCaseX, sliderCaseY, sliderCaseSize, sliderAlgH].forEach(slider => {
             slider.addEventListener('input', () => {
                 updateSliderLabels();
@@ -368,7 +360,6 @@
             });
         });
 
-        // Apply settings to all cases
         applyToAllBtn.addEventListener('click', () => {
             if (selectedIndex === null || casesData.length === 0) return;
             const template = casesData[selectedIndex];
@@ -384,18 +375,15 @@
 
         sheetTitleInput.addEventListener('input', drawSheet);
 
-        // Master Render Function for A4 Canvas
         function drawSheet() {
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw Title
             ctx.fillStyle = '#000000';
             ctx.font = 'bold 48px Arial';
             ctx.textAlign = 'center';
             ctx.fillText(sheetTitleInput.value || 'PLL Sheet', canvas.width / 2, 90);
 
-            // Header Underline
             ctx.strokeStyle = '#333333';
             ctx.lineWidth = 4;
             ctx.beginPath();
@@ -414,8 +402,8 @@
             }
 
             let marginX = 80;
-            let usableWidth = canvas.width - (marginX * 2); // 1080px
-            let colWidth = usableWidth / 2; // 540px per column
+            let usableWidth = canvas.width - (marginX * 2);
+            let colWidth = usableWidth / 2;
             let rowHeight = 115; 
             let startY = 170;
 
@@ -426,7 +414,6 @@
                 let currentX = marginX + (colIndex * colWidth);
                 let currentY = startY + (rowIndex * rowHeight);
 
-                // Auto-expand canvas height if needed
                 if (currentY + rowHeight > canvas.height - 80) {
                     let oldData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                     canvas.height += 500;
@@ -435,20 +422,17 @@
 
                 const img = item.img;
 
-                // 1. EXTRACT BOTTOM-LEFT CASE (Strict 1:1 Square Ratio)
                 let cropSize = img.width * item.caseSize;
                 let cropX = img.width * item.caseX;
                 let cropY = img.height * item.caseY;
-                let displaySize = 80; // Rendered square box size
+                let displaySize = 80;
 
                 ctx.drawImage(img, cropX, cropY, cropSize, cropSize, currentX, currentY, displaySize, displaySize);
                 
-                // Crisp border around case box
                 ctx.strokeStyle = '#cccccc';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(currentX, currentY, displaySize, displaySize);
 
-                // 2. EXTRACT TOP ALGORITHM (Full width preserved)
                 let algX = 0;
                 let algY = 0;
                 let algW = img.width;
@@ -464,7 +448,6 @@
             downloadBtn.disabled = false;
         }
 
-        // Native Safari download via Blob URL
         downloadBtn.addEventListener('click', () => {
             canvas.toBlob((blob) => {
                 const url = URL.createObjectURL(blob);
