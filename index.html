@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLL Sheet Studio - Ultimate Pro Edition v2</title>
-    <!-- Tailwind CSS CDN -->
+    <title>PLL Sheet Studio - Ultimate Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -54,28 +53,28 @@
             </div>
             <div>
                 <h1 class="font-bold text-sm tracking-wide text-zinc-100">PLL Sheet Studio</h1>
-                <p class="text-xs text-zinc-400">Ultimate Pro Edition v2</p>
+                <p class="text-xs text-zinc-400">Ultimate Edition</p>
             </div>
         </div>
 
         <div class="flex items-center gap-1 bg-zinc-950 p-1 rounded-lg border border-zinc-800">
             <button class="nav-tab px-4 py-1.5 text-xs font-medium rounded-md transition-all text-zinc-300 bg-zinc-800 shadow text-emerald-400" data-page="gridPage">
-                Sheet Generator
+                1. Sheet Generator & OG Sliders
             </button>
             <button class="nav-tab px-4 py-1.5 text-xs font-medium rounded-md transition-all text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900" data-page="fineTunePage">
-                Advanced Fine-Tuning
+                2. Extra Fine-Tuning
             </button>
             <button class="nav-tab px-4 py-1.5 text-xs font-medium rounded-md transition-all text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900" data-page="freeformPage">
-                Freeform Customizer
+                3. Block Customizer
             </button>
         </div>
 
         <div class="flex items-center gap-3">
             <button id="exportJsonBtn" class="px-3 py-1.5 text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg border border-zinc-700 transition">
-                Export Project
+                Export JSON
             </button>
             <button id="importJsonBtn" class="px-3 py-1.5 text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg border border-zinc-700 transition">
-                Import Project
+                Import JSON
             </button>
             <input type="file" id="jsonFileInput" accept=".json" class="hidden">
             <button id="globalDownloadBtn" class="px-4 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-lg shadow-emerald-900/30 transition">
@@ -99,24 +98,24 @@
             <div class="p-4 overflow-y-auto flex-grow flex flex-col gap-4 text-xs">
                 <!-- Presets & Quick Styles -->
                 <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner">
-                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px] mb-2.5">Layout Presets</h3>
+                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px] mb-2.5">Presets & Quick Styles</h3>
                     <div class="grid grid-cols-3 gap-2">
-                        <button id="presetStandard" class="px-2 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition text-center">3 Column</button>
-                        <button id="presetCompact" class="px-2 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition text-center">Compact</button>
-                        <button id="presetSpacious" class="px-2 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition text-center">Spacious</button>
+                        <button id="presetStandard" class="px-2 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition text-center leading-tight">Standard 3-Col</button>
+                        <button id="presetCompact" class="px-2 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition text-center leading-tight">Compact Grid</button>
+                        <button id="presetSpacious" class="px-2 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition text-center leading-tight">Spacious Study</button>
                     </div>
                 </div>
 
                 <!-- Sheet Properties -->
                 <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner space-y-2.5">
-                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px] mb-1">Sheet Metadata</h3>
+                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px] mb-1">Sheet Properties & OG Canvas</h3>
                     <div>
                         <label class="text-zinc-400 block mb-1">Sheet Title</label>
                         <input type="text" id="sheetTitle" value="Advanced Algorithm Sheet" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-zinc-100 focus:outline-none focus:border-emerald-500">
                     </div>
                     <div>
                         <label class="text-zinc-400 block mb-1">Subtitle / Footer Text</label>
-                        <input type="text" id="sheetSubtitle" value="Generated with PLL Sheet Studio Ultimate" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-zinc-100 focus:outline-none focus:border-emerald-500">
+                        <input type="text" id="sheetSubtitle" value="Generated with PLL Sheet Studio" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-zinc-100 focus:outline-none focus:border-emerald-500">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
@@ -129,11 +128,11 @@
                             </select>
                         </div>
                         <div>
-                            <label class="text-zinc-400 block mb-1">Theme Palette</label>
+                            <label class="text-zinc-400 block mb-1">Theme Background</label>
                             <select id="sheetTheme" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-1.5 text-zinc-100 focus:outline-none focus:border-emerald-500">
-                                <option value="white">Clean White</option>
-                                <option value="parchment">Parchment</option>
-                                <option value="dark">Dark Cyber</option>
+                                <option value="white" selected>Clean White</option>
+                                <option value="parchment">Classic Parchment</option>
+                                <option value="dark">Dark Cyber Mode</option>
                             </select>
                         </div>
                     </div>
@@ -141,29 +140,29 @@
 
                 <!-- Sliders & Geometry -->
                 <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner space-y-3">
-                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px]">Geometry & Spacing</h3>
+                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px]">OG Margin & Spacing Sliders</h3>
                     <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Top/Bottom Margin</span><span id="valMarginY" class="text-emerald-400 font-mono">100</span></div>
+                        <div class="flex justify-between text-zinc-400 mb-1"><span>Sheet Top/Bottom Margin:</span><span id="valMarginY" class="text-emerald-400 font-mono">100</span> px</div>
                         <input type="range" id="sheetMarginY" min="40" max="250" value="100" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
                     </div>
                     <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Left/Right Margin</span><span id="valMarginX" class="text-emerald-400 font-mono">80</span></div>
+                        <div class="flex justify-between text-zinc-400 mb-1"><span>Sheet Left/Right Margin:</span><span id="valMarginX" class="text-emerald-400 font-mono">80</span> px</div>
                         <input type="range" id="sheetMarginX" min="40" max="200" value="80" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
                     </div>
                     <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Case Crop X</span><span id="valGridCaseX" class="text-emerald-400 font-mono">4</span>%</div>
+                        <div class="flex justify-between text-zinc-400 mb-1"><span>Case Crop X:</span><span id="valGridCaseX" class="text-emerald-400 font-mono">4</span>%</div>
                         <input type="range" id="gridCaseX" min="0" max="50" value="4" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
                     </div>
                     <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Case Crop Y</span><span id="valGridCaseY" class="text-emerald-400 font-mono">74</span>%</div>
+                        <div class="flex justify-between text-zinc-400 mb-1"><span>Case Crop Y:</span><span id="valGridCaseY" class="text-emerald-400 font-mono">74</span>%</div>
                         <input type="range" id="gridCaseY" min="0" max="90" value="74" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
                     </div>
                     <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Case Image Size</span><span id="valGridCaseSize" class="text-emerald-400 font-mono">85</span>px</div>
+                        <div class="flex justify-between text-zinc-400 mb-1"><span>Case Image Size:</span><span id="valGridCaseSize" class="text-emerald-400 font-mono">85</span>px</div>
                         <input type="range" id="gridCaseSize" min="40" max="150" value="85" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
                     </div>
                     <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Algorithm Box Height</span><span id="valGridAlgH" class="text-emerald-400 font-mono">55</span>px</div>
+                        <div class="flex justify-between text-zinc-400 mb-1"><span>Algorithm Box Height:</span><span id="valGridAlgH" class="text-emerald-400 font-mono">55</span>px</div>
                         <input type="range" id="gridAlgH" min="30" max="120" value="55" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
                     </div>
                 </div>
@@ -752,7 +751,7 @@
             casesData[selectedIndex].fineCustomObjects.push({
                 type: 'box',
                 x: 100, y: 350, w: 200, h: 80,
-                color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`
+                color: '#10b981'
             });
             selectedFineObjIndex = casesData[selectedIndex].fineCustomObjects.length - 1;
             saveState();
@@ -1081,7 +1080,7 @@
                         item.fineCustomObjects.forEach(obj => {
                             if (obj.type === 'text') {
                                 ctxTarget.fillStyle = obj.color || textColor;
-                                ctxTarget.font = `${obj.fontSize || 20px} sans-serif`;
+                                ctxTarget.font = `${obj.fontSize || 20}px sans-serif`;
                                 ctxTarget.textAlign = 'left';
                                 ctxTarget.fillText(obj.text, currentX + (obj.x - 80), currentY + (obj.y - 140));
                             } else if (obj.type === 'box') {
