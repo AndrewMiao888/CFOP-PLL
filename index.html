@@ -3,534 +3,900 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLL Sheet Studio - Ultimate Edition</title>
+    <title>PLL Sheet Studio - Ultimate Pro Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darker: '#0a0a0a',
-                        cardbg: '#171717',
-                        accent: {
-                            DEFAULT: '#10b981',
-                            hover: '#059669',
-                            dark: '#047857'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        :root {
+            --bg-dark: #121212;
+            --panel-bg: #1e1e1e;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --accent-blue: #2196F3;
+            --text-main: #ffffff;
+            --text-muted: #b0b0b0;
+            --border: #383838;
         }
-        ::-webkit-scrollbar-track {
-            background: #121212;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #333333;
-            border-radius: 3px;
+
+        header.topnav {
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            height: 55px;
+            flex-shrink: 0;
+            z-index: 100;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4f46e5;
+
+        .topnav-brand {
+            font-weight: bold;
+            font-size: 15px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+
+        .topnav-tabs {
+            display: flex;
+            gap: 4px;
+            height: 100%;
+            align-items: center;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 8px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-main);
+            background: rgba(255,255,255,0.08);
+        }
+
+        .nav-tab.active {
+            color: var(--text-main);
+            background: #2a2a2a;
+            border-bottom: 3px solid var(--accent);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .app-layout {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        sidebar {
+            width: 390px;
+            background: var(--panel-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .sidebar-top {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            background: var(--panel-bg);
+            flex-shrink: 0;
+        }
+
+        .sidebar-scroll {
+            padding: 16px;
+            overflow-y: auto;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sidebar-bottom {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            background: var(--panel-bg);
+            flex-shrink: 0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .section-group {
+            background: #252525;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .section-group h3 {
+            margin: 0 0 12px 0;
+            font-size: 13px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        input[type="range"], select {
+            width: 100%;
+            margin-bottom: 10px;
+            background: #1a1a1a;
+            color: white;
+            border: 1px solid var(--border);
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        input[type="text"], input[type="file"], input[type="color"] {
+            width: 100%;
+            padding: 8px 10px;
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        input[type="color"] {
+            height: 36px;
+            padding: 2px;
+            cursor: pointer;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: background 0.2s;
+            text-align: center;
+        }
+
+        .btn:hover { background-color: var(--accent-hover); }
+        .btn:disabled { background-color: #444; color: #888; cursor: not-allowed; }
+        .btn-secondary { background-color: #383838; }
+        .btn-secondary:hover { background-color: #4d4d4d; }
+        .btn-danger { background-color: #d32f2f; }
+        .btn-danger:hover { background-color: #b71c1c; }
+        .btn-blue { background-color: var(--accent-blue); }
+        .btn-blue:hover { background-color: #1976D2; }
+
+        .thumb-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 180px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            padding: 4px;
+            border-radius: 4px;
+            background: #1a1a1a;
+        }
+
+        .thumb-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #252525;
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .thumb-item:hover { background: #303030; }
+        .thumb-item.active { border-color: var(--accent); background: #2c3e2e; }
+        .thumb-item img { width: 26px; height: 26px; object-fit: cover; border-radius: 4px; border: 1px solid #444; }
+        .thumb-item span { font-size: 11px; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        main {
+            flex-grow: 1;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: auto;
+            position: relative;
+        }
+
         canvas {
-            image-rendering: crisp-edges;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            background: white;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            cursor: crosshair;
+            max-height: 90vh;
+            width: auto;
+            border-radius: 2px;
+        }
+
+        .page-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: row;
+        }
+
+        .page-view.active-page {
+            display: flex;
+        }
+
+        .help-text {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #2e7d32;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 1000;
+            display: none;
+            transition: opacity 0.3s ease;
         }
     </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 font-sans h-screen flex flex-col overflow-hidden">
+<body>
 
-    <header class="bg-zinc-900 border-b border-zinc-800 h-16 flex items-center justify-between px-6 flex-shrink-0 z-50">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center font-bold text-white shadow-lg shadow-emerald-900/50">
-                PS
-            </div>
-            <div>
-                <h1 class="font-bold text-sm tracking-wide text-zinc-100">PLL Sheet Studio</h1>
-                <p class="text-xs text-zinc-400">Ultimate Edition</p>
-            </div>
+    <header class="topnav">
+        <div class="topnav-brand">
+            <span>🧊 PLL Sheet Studio - Ultimate Pro</span>
         </div>
-
-        <div class="flex items-center gap-1 bg-zinc-950 p-1 rounded-lg border border-zinc-800">
-            <button class="nav-tab px-4 py-1.5 text-xs font-medium rounded-md transition-all text-zinc-300 bg-zinc-800 shadow text-emerald-400" data-page="gridPage">
-                1. Sheet Generator & OG Sliders
-            </button>
-            <button class="nav-tab px-4 py-1.5 text-xs font-medium rounded-md transition-all text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900" data-page="fineTunePage">
-                2. Extra Fine-Tuning
-            </button>
-            <button class="nav-tab px-4 py-1.5 text-xs font-medium rounded-md transition-all text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900" data-page="freeformPage">
-                3. Block Customizer
-            </button>
+        <div class="topnav-tabs">
+            <button class="nav-tab active" data-page="gridPage">1. Sheet Generator & Sliders</button>
+            <button class="nav-tab" data-page="groupsPage">2. Groups & Categories</button>
+            <button class="nav-tab" data-page="fineTunePage">3. Fine-Tune & Text Studio</button>
+            <button class="nav-tab" data-page="freeformPage">4. Block Customizer</button>
         </div>
-
-        <div class="flex items-center gap-3">
-            <button id="exportJsonBtn" class="px-3 py-1.5 text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg border border-zinc-700 transition">
-                Export JSON
-            </button>
-            <button id="importJsonBtn" class="px-3 py-1.5 text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg border border-zinc-700 transition">
-                Import JSON
-            </button>
-            <input type="file" id="jsonFileInput" accept=".json" class="hidden">
-            <button id="globalDownloadBtn" class="px-4 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow-lg shadow-emerald-900/30 transition">
-                Export High-Res PNG
-            </button>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary" id="exportProjectBtn" style="padding: 8px 10px; font-size: 11px; border-radius: 6px;">Export JSON</button>
+            <button class="btn btn-secondary" id="importProjectBtn" style="padding: 8px 10px; font-size: 11px; border-radius: 6px;">Import JSON</button>
+            <button class="btn btn-danger" id="resetEverythingBtn" style="padding: 8px 10px; font-size: 11px; border-radius: 6px;">Reset</button>
+            <input type="file" id="importFile" accept=".json" style="display:none">
+            <button class="btn" id="globalDownloadBtn" style="padding: 8px 14px; font-size: 12px; border-radius: 6px;">Export High-Res PNG</button>
         </div>
     </header>
 
-    <!-- ================= PAGE 1: SHEET GENERATOR ================= -->
-    <div id="gridPage" class="page-view flex-grow flex overflow-hidden">
-        <aside class="w-96 bg-zinc-900/90 border-r border-zinc-800 flex flex-col h-full flex-shrink-0 shadow-2xl z-20">
-            <div class="p-4 border-b border-zinc-800 bg-zinc-900/50">
-                <label class="block text-xs font-semibold text-zinc-400 mb-2 uppercase tracking-wider">Upload Case Images</label>
-                <label class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-zinc-700 hover:border-emerald-500 rounded-xl cursor-pointer bg-zinc-950/50 hover:bg-zinc-900/50 transition group">
-                    <span class="text-xs font-medium text-zinc-300 group-hover:text-emerald-400">Click to browse or drop images</span>
-                    <span class="text-[10px] text-zinc-500 mt-0.5">PNG, JPG, WebP supported</span>
-                    <input type="file" id="imageUploadGrid" multiple accept="image/*" class="hidden">
-                </label>
+    <div id="gridPage" class="page-view active-page">
+        <sidebar>
+            <div class="sidebar-top">
+                <input type="file" class="imageUploadGlobal" multiple accept="image/*">
             </div>
-            
-            <div class="p-4 overflow-y-auto flex-grow flex flex-col gap-4 text-xs">
-                <!-- Presets & Quick Styles -->
-                <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner">
-                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px] mb-2.5">Presets & Quick Styles</h3>
-                    <div class="grid grid-cols-3 gap-2">
-                        <button id="presetStandard" class="px-2 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition text-center leading-tight">Standard 3-Col</button>
-                        <button id="presetCompact" class="px-2 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition text-center leading-tight">Compact Grid</button>
-                        <button id="presetSpacious" class="px-2 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition text-center leading-tight">Spacious Study</button>
+            <div class="sidebar-scroll">
+                <div class="section-group">
+                    <h3>Presets & Quick Styles</h3>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="presetStandard">Standard 3-Col</button>
+                        <button class="btn btn-secondary" id="presetCompact">Compact Grid</button>
+                        <button class="btn btn-secondary" id="presetSpacious">Spacious Study</button>
                     </div>
                 </div>
 
-                <!-- Sheet Properties -->
-                <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner space-y-2.5">
-                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px] mb-1">Sheet Properties & OG Canvas</h3>
-                    <div>
-                        <label class="text-zinc-400 block mb-1">Sheet Title</label>
-                        <input type="text" id="sheetTitle" value="Advanced Algorithm Sheet" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-zinc-100 focus:outline-none focus:border-emerald-500">
-                    </div>
-                    <div>
-                        <label class="text-zinc-400 block mb-1">Subtitle / Footer Text</label>
-                        <input type="text" id="sheetSubtitle" value="Generated with PLL Sheet Studio" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-zinc-100 focus:outline-none focus:border-emerald-500">
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="text-zinc-400 block mb-1">Columns Layout</label>
-                            <select id="columnLayout" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-1.5 text-zinc-100 focus:outline-none focus:border-emerald-500">
-                                <option value="4">4 Columns</option>
-                                <option value="3" selected>3 Columns</option>
-                                <option value="2">2 Columns</option>
-                                <option value="1">1 Column</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-zinc-400 block mb-1">Theme Background</label>
-                            <select id="sheetTheme" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-1.5 text-zinc-100 focus:outline-none focus:border-emerald-500">
-                                <option value="white" selected>Clean White</option>
-                                <option value="parchment">Classic Parchment</option>
-                                <option value="dark">Dark Cyber Mode</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="section-group">
+                    <h3>Sheet Properties</h3>
+                    <label>Sheet Title</label>
+                    <input type="text" id="sheetTitle" value="Advanced Algorithm Sheet">
+                    <label>Subtitle / Footer Text</label>
+                    <input type="text" id="sheetSubtitle" value="Generated with PLL Sheet Studio">
+                    <label>Columns Layout</label>
+                    <select id="columnLayout">
+                        <option value="1">1 Column</option>
+                        <option value="2">2 Columns</option>
+                        <option value="3" selected>3 Columns</option>
+                        <option value="4">4 Columns</option>
+                    </select>
+                    <label>Sheet Theme Background</label>
+                    <select id="sheetTheme">
+                        <option value="white" selected>Clean White</option>
+                        <option value="cream">Classic Parchment</option>
+                        <option value="dark">Dark Cyber Mode</option>
+                        <option value="blueprint">Blueprint Grid</option>
+                    </select>
+                </div>
+                
+                <div class="section-group">
+                    <h3>Margin & Spacing Sliders</h3>
+                    <label>Sheet Top/Bottom Margin: <span id="valSheetMarginY">100</span>px</label>
+                    <input type="range" id="sheetMarginY" min="40" max="250" value="100">
+                    <label>Sheet Left/Right Margin: <span id="valSheetMarginX">80</span>px</label>
+                    <input type="range" id="sheetMarginX" min="30" max="200" value="80">
+                    <label>Grid Row Gap: <span id="valRowGap">25</span>px</label>
+                    <input type="range" id="rowGap" min="5" max="80" value="25">
+                    <label>Grid Column Gap: <span id="valColGap">20</span>px</label>
+                    <input type="range" id="colGap" min="5" max="80" value="20">
                 </div>
 
-                <!-- Sliders & Geometry -->
-                <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner space-y-3">
-                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px]">OG Margin & Spacing Sliders</h3>
-                    <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Sheet Top/Bottom Margin:</span><span id="valMarginY" class="text-emerald-400 font-mono">100</span> px</div>
-                        <input type="range" id="sheetMarginY" min="40" max="250" value="100" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Sheet Left/Right Margin:</span><span id="valMarginX" class="text-emerald-400 font-mono">80</span> px</div>
-                        <input type="range" id="sheetMarginX" min="40" max="200" value="80" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Case Crop X:</span><span id="valGridCaseX" class="text-emerald-400 font-mono">4</span>%</div>
-                        <input type="range" id="gridCaseX" min="0" max="50" value="4" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Case Crop Y:</span><span id="valGridCaseY" class="text-emerald-400 font-mono">74</span>%</div>
-                        <input type="range" id="gridCaseY" min="0" max="90" value="74" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Case Image Size:</span><span id="valGridCaseSize" class="text-emerald-400 font-mono">85</span>px</div>
-                        <input type="range" id="gridCaseSize" min="40" max="150" value="85" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Algorithm Box Height:</span><span id="valGridAlgH" class="text-emerald-400 font-mono">55</span>px</div>
-                        <input type="range" id="gridAlgH" min="30" max="120" value="55" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
-                    </div>
+                <div class="section-group">
+                    <h3>Global Case & Alg Box Sliders</h3>
+                    <label>Mini Case Size: <span id="valGridCaseS">90</span>px</label>
+                    <input type="range" id="gridCaseS" min="40" max="180" value="90">
+                    <label>Mini Case X Offset: <span id="valGridCaseX">10</span>px</label>
+                    <input type="range" id="gridCaseX" min="0" max="200" value="10">
+                    <label>Mini Case Y Offset: <span id="valGridCaseY">15</span>px</label>
+                    <input type="range" id="gridCaseY" min="0" max="100" value="15">
+                    
+                    <div style="height:8px;"></div>
+                    
+                    <label>Mini Alg Width: <span id="valGridAlgW">210</span>px</label>
+                    <input type="range" id="gridAlgW" min="50" max="400" value="210">
+                    <label>Mini Alg Height: <span id="valGridAlgH">60</span>px</label>
+                    <input type="range" id="gridAlgH" min="30" max="150" value="60">
+                    <label>Mini Alg X Offset: <span id="valGridAlgX">115</span>px</label>
+                    <input type="range" id="gridAlgX" min="0" max="300" value="115">
                 </div>
 
-                <!-- Cases List & Manager -->
-                <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner flex flex-col gap-2">
-                    <div class="flex items-center justify-between">
-                        <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px]">Cases Manager (<span id="caseCountGrid">0</span>)</h3>
-                        <div class="flex gap-1">
-                            <button id="reverseOrderBtn" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-[10px]">Reverse</button>
-                            <button id="clearAllBtn" class="px-2 py-1 bg-rose-900/40 hover:bg-rose-900/70 text-rose-300 rounded text-[10px]">Clear</button>
-                        </div>
+                <div class="section-group">
+                    <h3>Cases Manager (<span class="caseCount">0</span>)</h3>
+                    <input type="text" id="searchFilter" placeholder="🔍 Search cases by name...">
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="reverseOrderBtn">Reverse Order</button>
+                        <button class="btn btn-danger" id="clearAllBtn">Clear All</button>
                     </div>
-                    <div id="thumbListGrid" class="thumb-list flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
-                        <div class="text-center text-zinc-500 py-6 text-xs">No images uploaded yet.</div>
+                    <div class="thumb-list renderThumbList">
+                        <div style="font-size: 11px; color: #777; text-align: center; padding: 10px;">Upload images to start.</div>
                     </div>
                 </div>
-
-                <!-- Groups Assign -->
-                <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner space-y-2">
-                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px]">Section Grouping</h3>
-                    <div>
-                        <label class="text-zinc-400 block mb-1">Group Name for Selected Case</label>
-                        <input type="text" id="groupNameInput" placeholder="e.g. T Perms, U Perms" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-zinc-100 focus:outline-none focus:border-emerald-500 mb-2">
-                        <button id="assignGroupBtn" class="w-full py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium rounded-lg transition text-center">Assign to Group</button>
-                    </div>
-                </div>
-
-                <button id="resetEverythingBtn" class="w-full py-2 bg-rose-950/50 hover:bg-rose-900/60 text-rose-300 border border-rose-900/50 font-medium rounded-xl transition text-center mt-2">Factory Reset All Data</button>
             </div>
-        </aside>
-
-        <main class="flex-grow bg-zinc-950 flex items-center justify-center p-8 overflow-auto relative">
-            <div class="absolute inset-0 bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
-            <canvas id="gridCanvas" width="1240" height="1754" class="max-h-[85vh] w-auto rounded shadow-2xl relative z-10 bg-white"></canvas>
+        </sidebar>
+        <main>
+            <canvas id="gridCanvas" width="1240" height="1754"></canvas>
         </main>
     </div>
 
-    <!-- ================= PAGE 2: ADVANCED FINE-TUNING ================= -->
-    <div id="fineTunePage" class="page-view hidden flex-grow flex overflow-hidden">
-        <aside class="w-96 bg-zinc-900/90 border-r border-zinc-800 flex flex-col h-full flex-shrink-0 shadow-2xl z-20">
-            <div class="p-4 border-b border-zinc-800 bg-zinc-900/50">
-                <label class="block text-xs font-semibold text-zinc-400 mb-2 uppercase tracking-wider">Add Additional Images</label>
-                <input type="file" id="imageUploadFine" multiple accept="image/*" class="w-full text-xs text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer">
+    <div id="groupsPage" class="page-view">
+        <sidebar>
+            <div class="sidebar-top">
+                <input type="file" class="imageUploadGlobal" multiple accept="image/*">
             </div>
-
-            <div class="p-4 overflow-y-auto flex-grow flex flex-col gap-4 text-xs">
-                <!-- History & Tool Actions -->
-                <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner space-y-2">
-                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px] mb-2">Editor Tools</h3>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button id="undoBtn" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition">Undo</button>
-                        <button id="redoBtn" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition">Redo</button>
+            <div class="sidebar-scroll">
+                <div class="section-group">
+                    <h3>🎯 Group & Category Manager</h3>
+                    <div class="help-text">
+                        Create custom groups (e.g. "U-Perms", "Corner Cases", "H & Z Perms"). Select cases, assign them to a group, and the sheet will automatically render gorgeous section headers as subtitles for each group!
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button id="addBoxBtn" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition">+ Add Box</button>
-                        <button id="addTextBtn" class="py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg font-medium transition">+ Add Text</button>
-                    </div>
-                    <button id="applyToAllFineBtn" class="w-full py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium rounded-lg transition">Apply Layout to All Cases</button>
-                </div>
-
-                <!-- Text Customize Panel -->
-                <div id="textCustomizeGroup" class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner space-y-2.5 hidden">
-                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px]">Text Properties</h3>
-                    <div>
-                        <label class="text-zinc-400 block mb-1">Content</label>
-                        <input type="text" id="fineTextInput" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-zinc-100 focus:outline-none focus:border-emerald-500">
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="text-zinc-400 block mb-1">Color</label>
-                            <input type="color" id="fineTextColor" value="#000000" class="w-full h-8 bg-zinc-900 border border-zinc-700 rounded-lg cursor-pointer p-1">
-                        </div>
-                        <div>
-                            <label class="text-zinc-400 block mb-1">Size: <span id="valFineFontSize" class="font-mono text-emerald-400">22</span>px</label>
-                            <input type="range" id="fineFontSizeSlider" min="12" max="64" value="22" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg mt-2">
-                        </div>
+                    <label>Create New Group Name</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="newGroupNameInput" placeholder="e.g. U-Perms" style="margin-bottom:0;">
+                        <button class="btn btn-blue" id="addGroupBtn" style="width: 100px;">Add Group</button>
                     </div>
                 </div>
 
-                <!-- Active Object Sliders -->
-                <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner space-y-3">
-                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px]">Active Object Box</h3>
-                    <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Position X</span><span id="valFineX" class="text-emerald-400 font-mono">80</span>px</div>
-                        <input type="range" id="fineSliderX" min="0" max="800" value="80" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Position Y</span><span id="valFineY" class="text-emerald-400 font-mono">160</span>px</div>
-                        <input type="range" id="fineSliderY" min="0" max="1200" value="160" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Width</span><span id="valFineW" class="text-emerald-400 font-mono">100</span>px</div>
-                        <input type="range" id="fineSliderW" min="20" max="400" value="100" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-zinc-400 mb-1"><span>Height</span><span id="valFineH" class="text-emerald-400 font-mono">100</span>px</div>
-                        <input type="range" id="fineSliderH" min="20" max="400" value="100" class="w-full accent-emerald-500 bg-zinc-800 h-1.5 rounded-lg">
+                <div class="section-group">
+                    <h3>Bulk Assign Selected Cases</h3>
+                    <label>Select Target Group</label>
+                    <select id="bulkGroupSelect">
+                        <option value="General">General</option>
+                    </select>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="assignSelectedToGroupBtn">Assign All Checked Cases to Group</button>
                     </div>
                 </div>
 
-                <!-- Thumbnails for Fine-Tuning -->
-                <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner flex flex-col gap-2">
-                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px]">Select Case to Edit</h3>
-                    <div id="thumbListFine" class="thumb-list flex flex-col gap-1.5 max-h-40 overflow-y-auto pr-1"></div>
+                <div class="section-group">
+                    <h3>Existing Groups (<span id="groupCountSpan">1</span>)</h3>
+                    <div id="groupListContainer" style="display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto;">
+                        <!-- Dynamically populated groups -->
+                    </div>
                 </div>
-
-                <button id="deleteFineItemBtn" disabled class="w-full py-2 bg-rose-950/30 hover:bg-rose-900/50 text-rose-300 border border-rose-900/50 font-medium rounded-xl transition disabled:opacity-40 disabled:cursor-not-allowed">Delete Selected Object</button>
             </div>
-        </aside>
-
-        <main class="flex-grow bg-zinc-950 flex items-center justify-center p-8 overflow-auto relative cursor-crosshair">
-            <div class="absolute inset-0 bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
-            <canvas id="fineCanvas" width="1240" height="1754" class="max-h-[85vh] w-auto rounded shadow-2xl relative z-10 bg-white"></canvas>
+        </sidebar>
+        <main>
+            <canvas id="groupsCanvas" width="1240" height="1754"></canvas>
         </main>
     </div>
 
-    <!-- ================= PAGE 3: FREEFORM CUSTOMIZER ================= -->
-    <div id="freeformPage" class="page-view hidden flex-grow flex overflow-hidden">
-        <aside class="w-96 bg-zinc-900/90 border-r border-zinc-800 flex flex-col h-full flex-shrink-0 shadow-2xl z-20">
-            <div class="p-4 border-b border-zinc-800 bg-zinc-900/50">
-                <label class="block text-xs font-semibold text-zinc-400 mb-2 uppercase tracking-wider">Add Images</label>
-                <input type="file" id="imageUploadFree" multiple accept="image/*" class="w-full text-xs text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer">
+    <div id="fineTunePage" class="page-view">
+        <sidebar>
+            <div class="sidebar-top">
+                <input type="file" class="imageUploadGlobal" multiple accept="image/*">
             </div>
-
-            <div class="p-4 overflow-y-auto flex-grow flex flex-col gap-4 text-xs">
-                <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner space-y-2">
-                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px]">Freeform Layout</h3>
-                    <p class="text-zinc-400 leading-relaxed">Click and drag any block or resize edges directly on the canvas to design custom layouts.</p>
-                    <button id="applyToAllFreeBtn" class="w-full py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium rounded-lg transition mt-2">Reset Auto Grid Alignment</button>
+            <div class="sidebar-scroll">
+                <div class="section-group">
+                    <h3>Extraction & Precision Control</h3>
+                    <div class="help-text">Drag the Green/Blue boxes on the original full image. <strong>Note:</strong> Text and box annotations always render directly on top of the case picture!</div>
+                    <div class="btn-group">
+                        <button class="btn btn-blue" id="applyCropToAllBtn">Apply Crop To All</button>
+                    </div>
                 </div>
 
-                <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 shadow-inner flex flex-col gap-2">
-                    <h3 class="font-semibold text-emerald-400 uppercase tracking-wider text-[11px]">Cases List</h3>
-                    <div id="thumbListFree" class="thumb-list flex flex-col gap-1.5 max-h-60 overflow-y-auto pr-1"></div>
+                <div class="section-group">
+                    <h3>Active Crop Sliders</h3>
+                    <label>Original Image X: <span id="valFineX">0</span>px</label>
+                    <input type="range" id="fineSliderX" min="0" max="1000" value="0">
+                    <label>Original Image Y: <span id="valFineY">0</span>px</label>
+                    <input type="range" id="fineSliderY" min="0" max="1000" value="0">
+                    <label>Crop Width: <span id="valFineW">100</span>px</label>
+                    <input type="range" id="fineSliderW" min="20" max="1000" value="100">
+                    <label>Crop Height: <span id="valFineH">100</span>px</label>
+                    <input type="range" id="fineSliderH" min="20" max="1000" value="100">
+                </div>
+
+                <div class="section-group" id="textAnnotationGroup" style="display: none;">
+                    <h3>✏️ Selected Text Annotation Controls</h3>
+                    <label>Text Content</label>
+                    <input type="text" id="annotationTextInput" placeholder="Enter text annotation...">
+                    <label>Text Color</label>
+                    <input type="color" id="annotationColorInput" value="#f44336">
+                    <label>Font Size: <span id="valFontSize">24</span>px</label>
+                    <input type="range" id="annotationFontSizeSlider" min="10" max="120" value="24">
+                </div>
+
+                <div class="section-group">
+                    <h3>Annotations & Watermarks</h3>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="addBoxBtn">+ Draw Box on Case</button>
+                        <button class="btn btn-secondary" id="addTextBtn">+ Add Text on Case</button>
+                    </div>
+                </div>
+
+                <div class="section-group">
+                    <h3>Select Active Case</h3>
+                    <div class="thumb-list renderThumbList"></div>
+                    <div style="margin-top: 8px;">
+                        <button class="btn btn-secondary" id="reverseOrderBtn2">Reverse Order</button>
+                    </div>
                 </div>
             </div>
-        </aside>
-
-        <main class="flex-grow bg-zinc-950 flex items-center justify-center p-8 overflow-auto relative">
-            <div class="absolute inset-0 bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
-            <canvas id="freeCanvas" width="1240" height="1754" class="max-h-[85vh] w-auto rounded shadow-2xl relative z-10 bg-white"></canvas>
+            <div class="sidebar-bottom">
+                <button class="btn btn-secondary" id="moveUpBtn" title="Move Case Up">▲ Up</button>
+                <button class="btn btn-secondary" id="moveDownBtn" title="Move Case Down">▼ Down</button>
+                <button class="btn btn-danger" id="deleteFineItemBtn" disabled>Delete Object</button>
+            </div>
+        </sidebar>
+        <main>
+            <canvas id="fineCanvas" width="1240" height="1754"></canvas>
         </main>
     </div>
 
-    <div id="customModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h3 id="modalTitle" class="text-base font-bold text-zinc-100">Notification</h3>
-            <p id="modalMessage" class="text-sm text-zinc-300 leading-relaxed">Message goes here...</p>
-            <div id="modalButtons" class="flex justify-end gap-2 pt-2">
-                <button id="modalCloseBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold transition">OK</button>
+    <div id="freeformPage" class="page-view">
+        <sidebar>
+            <div class="sidebar-top">
+                <input type="file" class="imageUploadGlobal" multiple accept="image/*">
+            </div>
+            <div class="sidebar-scroll">
+                <div class="section-group">
+                    <h3>Custom Block Placer</h3>
+                    <div class="help-text">
+                        Drag the large blocks around the sheet. Changes save instantly!<br><br>
+                        <strong>Magic Feature:</strong> Click INSIDE a block to drag the Mini Case or Mini Algorithm to design your own custom layouts!
+                    </div>
+                    <button class="btn btn-blue" id="syncBlockLayoutBtn" style="margin-bottom: 8px;">Apply Selected Block Layout to All</button>
+                    <button class="btn btn-secondary" id="resetFreeformPositionsBtn">Auto-Arrange Blocks</button>
+                </div>
+                
+                <div class="section-group">
+                    <h3>Select Active Case</h3>
+                    <div class="thumb-list renderThumbList"></div>
+                    <div style="margin-top: 8px;">
+                        <button class="btn btn-secondary" id="reverseOrderBtn3">Reverse Order</button>
+                    </div>
+                </div>
+            </div>
+        </sidebar>
+        <main>
+            <canvas id="freeCanvas" width="1240" height="1754"></canvas>
+        </main>
+    </div>
+
+    <div id="toast">Notification Message</div>
+
+    <div id="resetModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 2000; display: none; align-items: center; justify-content: center;">
+        <div style="background: #1e1e1e; border: 1px solid #383838; padding: 24px; border-radius: 12px; width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.8);">
+            <h3 style="color: #d32f2f; margin-top: 0; margin-bottom: 12px; font-size: 18px;">⚠️ Factory Reset Everything</h3>
+            <p style="color: #b0b0b0; font-size: 13px; line-height: 1.5; margin-bottom: 20px;">Are you sure you want to delete all cases, custom groups, and local storage? This cannot be undone.</p>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-secondary" id="cancelResetBtn" style="flex: 1;">Cancel</button>
+                <button class="btn btn-danger" id="confirmResetBtn" style="flex: 1;">Yes, Reset Everything</button>
             </div>
         </div>
     </div>
 
     <script>
         let casesData = [];
+        let groupsData = ['General', 'U-Perms', 'H & Z Perms', 'Corner Cases'];
         let selectedIndex = null;
-        let historyStack = [];
-        let redoStack = [];
+        let selectedFreeIndex = null;
+        let searchQuery = "";
+        
+        let sheetProps = {
+            title: "Advanced Algorithm Sheet",
+            subtitle: "Generated with PLL Sheet Studio",
+            columns: 3,
+            theme: "white",
+            marginTopY: 100,
+            marginRowX: 80,
+            rowGap: 25,
+            colGap: 20
+        };
 
-        let selectedFineObjIndex = null;
-        let isDraggingObj = false;
-        let resizingHandle = null;
-        let dragOffsetX = 0, dragOffsetY = 0;
-        let startX = 0, startY = 0;
-        const handleSize = 10;
+        let globalLayout = {
+            caseS: 90,
+            caseX: 10,
+            caseY: 15,
+            algW: 210,
+            algH: 60,
+            algX: 115
+        };
 
-        // Custom Modal implementation replacing native alert/confirm
-        function showModal(title, message, onConfirm = null) {
-            const modal = document.getElementById('customModal');
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalMessage').innerText = message;
-            const btnContainer = document.getElementById('modalButtons');
-            btnContainer.innerHTML = '';
-            
-            if (onConfirm) {
-                const cancelBtn = document.createElement('button');
-                cancelBtn.className = 'px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl text-xs font-semibold transition';
-                cancelBtn.innerText = 'Cancel';
-                cancelBtn.onclick = () => modal.classList.add('hidden');
-                btnContainer.appendChild(cancelBtn);
+        let activeFineObj = null;
+        let isDraggingFine = false;
+        let fineResizingHandle = null;
+        let fineScale = 1;
+        let fineOffsetX = 0, fineOffsetY = 0;
+        let fineDragStartX = 0, fineDragStartY = 0;
 
-                const confirmBtn = document.createElement('button');
-                confirmBtn.className = 'px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold transition';
-                confirmBtn.innerText = 'Confirm';
-                confirmBtn.onclick = () => {
-                    modal.classList.add('hidden');
-                    onConfirm();
-                };
-                btnContainer.appendChild(confirmBtn);
-            } else {
-                const okBtn = document.createElement('button');
-                okBtn.className = 'px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold transition';
-                okBtn.innerText = 'OK';
-                okBtn.onclick = () => modal.classList.add('hidden');
-                btnContainer.appendChild(okBtn);
-            }
-            modal.classList.remove('hidden');
+        let activeFreeDragMode = null;
+        let freeDragOffX = 0, freeDragOffY = 0;
+        let freeResizingHandle = null;
+
+        const handleSize = 12;
+
+        function showToast(msg, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => { toast.style.display = 'none'; }, 300);
+            }, duration);
         }
 
-        // Load data from LocalStorage
-        function loadFromLocalStorage() {
-            try {
-                const saved = localStorage.getItem('pll_sheet_studio_ultimate_v2');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (parsed.cases) {
-                        casesData = parsed.cases.map(c => {
-                            const img = new Image();
-                            img.src = c.imgSrc;
-                            return { ...c, img };
-                        });
-                    }
-                    if (parsed.title) document.getElementById('sheetTitle').value = parsed.title;
-                    if (parsed.subtitle) document.getElementById('sheetSubtitle').value = parsed.subtitle;
-                    if (parsed.columns) document.getElementById('columnLayout').value = parsed.columns;
-                    if (parsed.theme) document.getElementById('sheetTheme').value = parsed.theme;
-                    if (parsed.marginY) document.getElementById('sheetMarginY').value = parsed.marginY;
-                    if (parsed.marginX) document.getElementById('sheetMarginX').value = parsed.marginX;
-                }
-            } catch (e) {
-                console.error("Error loading localStorage", e);
-            }
+        function ensureCaseProperties(item, img, index = 0) {
+            if (!item.cropCase) item.cropCase = { id: 'cropCase', type: 'crop', color: '#4CAF50', label: 'Case Extract', x: img.width * 0.04, y: img.height * 0.70, w: img.width * 0.18, h: img.width * 0.18 };
+            if (!item.cropAlg) item.cropAlg = { id: 'cropAlg', type: 'crop', color: '#2196F3', label: 'Alg Extract', x: 0, y: 0, w: img.width, h: img.height * 0.22 };
+            if (!item.extraObjs) item.extraObjs = [];
+            if (!item.category) item.category = 'General';
+            if (!item.freeBlock) item.freeBlock = { x: 80 + ((index % 2) * 540), y: 180 + (Math.floor(index / 2) * 140), w: 400, h: 120 };
+            if (!item.layoutCase) item.layoutCase = { x: globalLayout.caseX, y: globalLayout.caseY, w: globalLayout.caseS, h: globalLayout.caseS };
+            if (!item.layoutAlg) item.layoutAlg = { x: globalLayout.algX, y: 25, w: globalLayout.algW, h: globalLayout.algH };
+            if (item.enabled === undefined) item.enabled = true;
         }
 
         function saveToLocalStorage() {
             try {
-                const dataToSave = {
-                    title: document.getElementById('sheetTitle').value,
-                    subtitle: document.getElementById('sheetSubtitle').value,
-                    columns: document.getElementById('columnLayout').value,
-                    theme: document.getElementById('sheetTheme').value,
-                    marginY: document.getElementById('sheetMarginY').value,
-                    marginX: document.getElementById('sheetMarginX').value,
+                const saveData = {
+                    sheetProps,
+                    globalLayout,
+                    groupsData,
                     cases: casesData.map(c => ({
-                        imgSrc: c.img.src,
                         name: c.name,
                         enabled: c.enabled,
-                        group: c.group || 'General',
-                        caseX: c.caseX,
-                        caseY: c.caseY,
-                        caseSize: c.caseSize,
-                        algH: c.algH,
-                        freeX: c.freeX,
-                        freeY: c.freeY,
-                        freeW: c.freeW,
-                        freeH: c.freeH,
-                        fineCustomObjects: c.fineCustomObjects
+                        category: c.category || 'General',
+                        dataUrl: c.dataUrl,
+                        cropCase: c.cropCase,
+                        cropAlg: c.cropAlg,
+                        extraObjs: c.extraObjs,
+                        freeBlock: c.freeBlock,
+                        layoutCase: c.layoutCase,
+                        layoutAlg: c.layoutAlg
                     }))
                 };
-                localStorage.setItem('pll_sheet_studio_ultimate_v2', JSON.stringify(dataToSave));
+                localStorage.setItem('pll_sheet_studio_pro_data', JSON.stringify(saveData));
             } catch (e) {
-                console.error("Error saving localStorage", e);
+                console.error("Failed to save to localStorage:", e);
             }
         }
 
-        // Navigation Tabs switching logic
-        const navTabs = document.querySelectorAll('.nav-tab');
-        const pageViews = document.querySelectorAll('.page-view');
-
-        navTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                navTabs.forEach(t => {
-                    t.classList.remove('bg-zinc-800', 'text-emerald-400', 'shadow');
-                    t.classList.add('text-zinc-400');
-                });
-                pageViews.forEach(p => p.classList.add('hidden'));
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('pll_sheet_studio_pro_data');
+                if (!saved) return;
+                const parsed = JSON.parse(saved);
+                if (parsed.sheetProps) sheetProps = { ...sheetProps, ...parsed.sheetProps };
+                if (parsed.globalLayout) globalLayout = { ...globalLayout, ...parsed.globalLayout };
+                if (parsed.groupsData && Array.isArray(parsed.groupsData)) groupsData = parsed.groupsData;
                 
-                tab.classList.remove('text-zinc-400');
-                tab.classList.add('bg-zinc-800', 'text-emerald-400', 'shadow');
-                document.getElementById(tab.dataset.page).classList.remove('hidden');
+                document.getElementById('sheetTitle').value = sheetProps.title;
+                document.getElementById('sheetSubtitle').value = sheetProps.subtitle;
+                document.getElementById('columnLayout').value = sheetProps.columns;
+                document.getElementById('sheetTheme').value = sheetProps.theme;
+                document.getElementById('sheetMarginY').value = sheetProps.marginTopY;
+                document.getElementById('valSheetMarginY').innerText = sheetProps.marginTopY;
+                document.getElementById('sheetMarginX').value = sheetProps.marginRowX;
+                document.getElementById('valSheetMarginX').innerText = sheetProps.marginRowX;
+                document.getElementById('rowGap').value = sheetProps.rowGap;
+                document.getElementById('valRowGap').innerText = sheetProps.rowGap;
+                document.getElementById('colGap').value = sheetProps.colGap;
+                document.getElementById('valColGap').innerText = sheetProps.colGap;
+
+                ['caseS', 'caseX', 'caseY', 'algW', 'algH', 'algX'].forEach(prop => {
+                    const el = document.getElementById('grid' + prop.charAt(0).toUpperCase() + prop.slice(1));
+                    if(el) {
+                        el.value = globalLayout[prop];
+                        const valEl = document.getElementById('valGrid' + prop.charAt(0).toUpperCase() + prop.slice(1));
+                        if(valEl) valEl.innerText = globalLayout[prop];
+                    }
+                });
+
+                if (parsed.cases && Array.isArray(parsed.cases)) {
+                    let loadedCount = 0;
+                    parsed.cases.forEach((item, index) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            ensureCaseProperties(item, img, index);
+                            item.img = img;
+                            casesData.push(item);
+                            loadedCount++;
+                            if (loadedCount === parsed.cases.length) {
+                                if (selectedIndex === null && casesData.length > 0) {
+                                    selectedIndex = 0;
+                                    selectedFreeIndex = 0;
+                                    activeFineObj = casesData[0].cropCase;
+                                }
+                                updateThumbnails();
+                                updateGroupsUI();
+                                updateFineSlidersBounds();
+                                redrawAll();
+                            }
+                        };
+                        img.src = item.dataUrl;
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to load from localStorage:", e);
+            }
+        }
+
+        // Factory Reset Handlers
+        document.getElementById('resetEverythingBtn').addEventListener('click', () => {
+            document.getElementById('resetModal').style.display = 'flex';
+        });
+
+        document.getElementById('cancelResetBtn').addEventListener('click', () => {
+            document.getElementById('resetModal').style.display = 'none';
+        });
+
+        document.getElementById('confirmResetBtn').addEventListener('click', () => {
+            localStorage.removeItem('pll_sheet_studio_pro_data');
+            casesData = [];
+            groupsData = ['General', 'U-Perms', 'H & Z Perms', 'Corner Cases'];
+            selectedIndex = null;
+            selectedFreeIndex = null;
+            activeFineObj = null;
+            updateThumbnails();
+            updateGroupsUI();
+            redrawAll();
+            document.getElementById('resetModal').style.display = 'none';
+            showToast("Factory reset complete!");
+        });
+
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active-page'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.page).classList.add('active-page');
+                if (tab.dataset.page === 'fineTunePage' && selectedIndex !== null && casesData[selectedIndex] && !activeFineObj) {
+                    activeFineObj = casesData[selectedIndex].cropCase;
+                    updateFineSlidersBounds();
+                }
+                updateGroupsUI();
                 redrawAll();
             });
         });
 
-        // File upload handler
-        function handleFilesUpload(e) {
-            const files = Array.from(e.target.files);
-            if (files.length === 0) return;
-            let loaded = 0;
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        casesData.push({
-                            img: img,
-                            name: file.name,
-                            enabled: true,
-                            group: 'General',
-                            caseX: 4,
-                            caseY: 74,
-                            caseSize: 85,
-                            algH: 55,
-                            freeX: 100 + ((casesData.length % 2) * 520),
-                            freeY: 180 + (Math.floor(casesData.length / 2) * 140),
-                            freeW: 480,
-                            freeH: 110,
-                            fineCustomObjects: [
-                                { type: 'crop_case', x: 80, y: 160, w: 100, h: 100, label: 'Case Image' },
-                                { type: 'crop_alg', x: 200, y: 180, w: 350, h: 70, label: 'Algorithm Box' }
-                            ]
-                        });
-                        loaded++;
-                        if (loaded === files.length) {
-                            if (selectedIndex === null) selectedIndex = 0;
-                            saveState();
-                            updateAllThumbnails();
-                            updateFineSliders();
-                            redrawAll();
-                            saveToLocalStorage();
-                        }
-                    };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-            e.target.value = '';
+        // Group Management UI
+        document.getElementById('addGroupBtn').addEventListener('click', () => {
+            const input = document.getElementById('newGroupNameInput');
+            const name = input.value.trim();
+            if (!name) return;
+            if (groupsData.includes(name)) {
+                showToast("Group already exists!");
+                return;
+            }
+            groupsData.push(name);
+            input.value = '';
+            updateGroupsUI();
+            saveToLocalStorage();
+            showToast(`Created group: ${name}`);
+        });
+
+        function updateGroupsUI() {
+            document.getElementById('groupCountSpan').innerText = groupsData.length;
+            const selectEl = document.getElementById('bulkGroupSelect');
+            if (selectEl) {
+                selectEl.innerHTML = groupsData.map(g => `<option value="${g}">${g}</option>`).join('');
+            }
+
+            const listEl = document.getElementById('groupListContainer');
+            if (listEl) {
+                listEl.innerHTML = groupsData.map((g, idx) => {
+                    const count = casesData.filter(c => (c.category || 'General') === g).length;
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: #1a1a1a; padding: 8px 10px; border-radius: 6px; border: 1px solid #333;">
+                            <span style="font-size: 12px; font-weight: 600; color: #4CAF50;">📁 ${g} (${count} cases)</span>
+                            ${idx > 0 ? `<button class="btn btn-danger" onclick="deleteGroup('${g}')" style="width: auto; padding: 3px 8px; font-size: 10px;">Delete</button>` : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
         }
 
-        document.getElementById('imageUploadGrid').addEventListener('change', handleFilesUpload);
-        document.getElementById('imageUploadFine').addEventListener('change', handleFilesUpload);
-        document.getElementById('imageUploadFree').addEventListener('change', handleFilesUpload);
+        window.deleteGroup = function(groupName) {
+            if (groupName === 'General') return;
+            casesData.forEach(c => {
+                if (c.category === groupName) c.category = 'General';
+            });
+            groupsData = groupsData.filter(g => g !== groupName);
+            updateGroupsUI();
+            saveToLocalStorage();
+            redrawAll();
+            showToast(`Deleted group: ${groupName}`);
+        };
 
-        // Update thumbnails across all sidebars
-        function updateAllThumbnails() {
-            document.getElementById('caseCountGrid').innerText = casesData.length;
+        document.getElementById('assignSelectedToGroupBtn').addEventListener('click', () => {
+            const targetGroup = document.getElementById('bulkGroupSelect').value;
+            let count = 0;
+            casesData.forEach((c, i) => {
+                const cb = document.querySelector(`.case-group-checkbox[data-index="${i}"]`);
+                if (cb && cb.checked) {
+                    c.category = targetGroup;
+                    count++;
+                }
+            });
+            saveToLocalStorage();
+            updateGroupsUI();
+            redrawAll();
+            showToast(`Assigned ${count} case(s) to ${targetGroup}!`);
+        });
 
-            ['Grid', 'Fine', 'Free'].forEach(suffix => {
-                const listEl = document.getElementById(`thumbList${suffix}`);
-                if (!listEl) return;
+        document.querySelectorAll('.imageUploadGlobal').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
+                
+                let loaded = 0;
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const dataUrl = event.target.result;
+                        const img = new Image();
+                        img.onload = () => {
+                            const newCase = {
+                                img: img,
+                                name: file.name,
+                                enabled: true,
+                                category: 'General',
+                                dataUrl: dataUrl,
+                                cropCase: { id: 'cropCase', type: 'crop', color: '#4CAF50', label: 'Case Extract', x: img.width * 0.04, y: img.height * 0.70, w: img.width * 0.18, h: img.width * 0.18 },
+                                cropAlg: { id: 'cropAlg', type: 'crop', color: '#2196F3', label: 'Alg Extract', x: 0, y: 0, w: img.width, h: img.height * 0.22 },
+                                extraObjs: [],
+                                freeBlock: { 
+                                    x: 80 + ((casesData.length % 2) * 540), 
+                                    y: 180 + (Math.floor(casesData.length / 2) * 140), 
+                                    w: 400, 
+                                    h: 120 
+                                },
+                                layoutCase: { x: globalLayout.caseX, y: globalLayout.caseY, w: globalLayout.caseS, h: globalLayout.caseS },
+                                layoutAlg: { x: globalLayout.algX, y: 25, w: globalLayout.algW, h: globalLayout.algH }
+                            };
+                            casesData.push(newCase);
+                            
+                            loaded++;
+                            if (loaded === files.length) {
+                                if (selectedIndex === null) {
+                                    selectedIndex = 0;
+                                    selectedFreeIndex = 0;
+                                    activeFineObj = casesData[0].cropCase;
+                                }
+                                updateThumbnails();
+                                updateGroupsUI();
+                                updateFineSlidersBounds();
+                                saveToLocalStorage();
+                                redrawAll();
+                                showToast(`Successfully added ${files.length} image(s)!`);
+                            }
+                        };
+                        img.src = dataUrl;
+                    };
+                    reader.readAsDataURL(file);
+                });
+                e.target.value = '';
+            });
+        });
+
+        function updateThumbnails() {
+            document.querySelectorAll('.caseCount').forEach(el => el.innerText = casesData.length);
+            document.querySelectorAll('.renderThumbList').forEach(listEl => {
                 listEl.innerHTML = '';
                 if (casesData.length === 0) {
-                    listEl.innerHTML = '<div class="text-center text-zinc-500 py-6 text-xs">No images uploaded yet.</div>';
+                    listEl.innerHTML = '<div style="font-size: 11px; color: #777; text-align: center; padding: 10px;">Upload images to start.</div>';
                     return;
                 }
 
                 casesData.forEach((item, idx) => {
+                    if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+                        return;
+                    }
+
                     const div = document.createElement('div');
-                    div.className = `flex items-center gap-2.5 p-2 rounded-lg border transition cursor-pointer bg-zinc-900 ${idx === selectedIndex ? 'border-emerald-500 bg-zinc-800/80 shadow' : 'border-zinc-800 hover:bg-zinc-800/50'}`;
+                    div.className = `thumb-item ${idx === selectedIndex ? 'active' : ''}`;
                     
                     const thumbCanvas = document.createElement('canvas');
-                    thumbCanvas.width = 24;
-                    thumbCanvas.height = 24;
+                    thumbCanvas.width = 26; thumbCanvas.height = 26;
                     const tCtx = thumbCanvas.getContext('2d');
-                    tCtx.drawImage(item.img, 0, 0, thumbCanvas.width, thumbCanvas.height);
+                    tCtx.drawImage(item.img, 0, 0, 26, 26);
 
                     div.innerHTML = `
-                        <input type="checkbox" ${item.enabled ? 'checked' : ''} data-index="${idx}" class="toggle-case accent-emerald-500 rounded">
-                        <img src="${thumbCanvas.toDataURL()}" class="w-6 h-6 object-cover rounded border border-zinc-700">
-                        <span class="text-xs text-zinc-200 truncate flex-grow">${item.name} <span class="text-[10px] text-zinc-400">(${item.group || 'General'})</span></span>
+                        <input type="checkbox" class="case-group-checkbox" ${item.enabled ? 'checked' : ''} data-index="${idx}" style="cursor:pointer;" title="Enable/Disable case">
+                        <img src="${thumbCanvas.toDataURL()}">
+                        <span title="${item.name}">${item.name}</span>
+                        <span style="font-size:9px; background:#333; padding:2px 4px; border-radius:3px; color:#aaa;">${item.category || 'General'}</span>
                     `;
 
                     div.addEventListener('click', (e) => {
                         if (e.target.tagName === 'INPUT') return;
                         selectedIndex = idx;
-                        selectedFineObjIndex = 0;
-                        updateAllThumbnails();
-                        updateFineSliders();
+                        selectedFreeIndex = idx;
+                        activeFineObj = casesData[idx].cropCase;
+                        updateThumbnails();
+                        updateFineSlidersBounds();
                         redrawAll();
                     });
 
-                    div.querySelector('.toggle-case').addEventListener('change', (e) => {
+                    div.querySelector('input').addEventListener('change', (e) => {
                         casesData[idx].enabled = e.target.checked;
-                        saveState();
-                        redrawAll();
                         saveToLocalStorage();
+                        redrawAll();
                     });
 
                     listEl.appendChild(div);
@@ -538,245 +904,316 @@
             });
         }
 
-        function updateFineSliders() {
-            if (selectedIndex === null || !casesData[selectedIndex]) {
-                document.getElementById('textCustomizeGroup').classList.add('hidden');
-                return;
-            }
-            const objs = casesData[selectedIndex].fineCustomObjects;
-            if (selectedFineObjIndex !== null && objs[selectedFineObjIndex]) {
-                const obj = objs[selectedFineObjIndex];
-                document.getElementById('fineSliderX').value = obj.x;
-                document.getElementById('fineSliderY').value = obj.y;
-                document.getElementById('fineSliderW').value = obj.w;
-                document.getElementById('fineSliderH').value = obj.h;
-                document.getElementById('valFineX').innerText = Math.round(obj.x);
-                document.getElementById('valFineY').innerText = Math.round(obj.y);
-                document.getElementById('valFineW').innerText = Math.round(obj.w);
-                document.getElementById('valFineH').innerText = Math.round(obj.h);
+        document.getElementById('searchFilter').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            updateThumbnails();
+        });
 
-                if (obj.type === 'text') {
-                    document.getElementById('textCustomizeGroup').classList.remove('hidden');
-                    document.getElementById('fineTextInput').value = obj.text || '';
-                    document.getElementById('fineTextColor').value = obj.color || '#000000';
-                    document.getElementById('fineFontSizeSlider').value = obj.fontSize || 22;
-                    document.getElementById('valFineFontSize').innerText = obj.fontSize || 22;
-                } else {
-                    document.getElementById('textCustomizeGroup').classList.add('hidden');
-                }
-            } else {
-                document.getElementById('textCustomizeGroup').classList.add('hidden');
-            }
-        }
-
-        // Presets buttons
         document.getElementById('presetStandard').addEventListener('click', () => {
-            document.getElementById('columnLayout').value = "3";
-            document.getElementById('sheetMarginY').value = "100";
-            document.getElementById('sheetMarginX').value = "80";
-            document.getElementById('valMarginY').innerText = "100";
-            document.getElementById('valMarginX').innerText = "80";
-            saveState();
-            redrawAll();
+            sheetProps.columns = 3;
+            sheetProps.marginTopY = 100;
+            sheetProps.marginRowX = 80;
+            sheetProps.rowGap = 25;
+            sheetProps.colGap = 20;
+            document.getElementById('columnLayout').value = 3;
+            document.getElementById('sheetMarginY').value = 100;
+            document.getElementById('valSheetMarginY').innerText = 100;
+            document.getElementById('sheetMarginX').value = 80;
+            document.getElementById('valSheetMarginX').innerText = 80;
+            document.getElementById('rowGap').value = 25;
+            document.getElementById('valRowGap').innerText = 25;
+            document.getElementById('colGap').value = 20;
+            document.getElementById('valColGap').innerText = 20;
             saveToLocalStorage();
+            redrawAll();
+            showToast("Applied Standard 3-Column Preset");
         });
 
         document.getElementById('presetCompact').addEventListener('click', () => {
-            document.getElementById('columnLayout').value = "4";
-            document.getElementById('sheetMarginY').value = "50";
-            document.getElementById('sheetMarginX').value = "40";
-            document.getElementById('valMarginY').innerText = "50";
-            document.getElementById('valMarginX').innerText = "40";
-            saveState();
-            redrawAll();
+            sheetProps.columns = 4;
+            sheetProps.marginTopY = 70;
+            sheetProps.marginRowX = 50;
+            sheetProps.rowGap = 15;
+            sheetProps.colGap = 15;
+            globalLayout.caseS = 70;
+            globalLayout.algW = 160;
+            globalLayout.algH = 50;
+            globalLayout.algX = 90;
+            document.getElementById('columnLayout').value = 4;
+            document.getElementById('sheetMarginY').value = 70;
+            document.getElementById('valSheetMarginY').innerText = 70;
+            document.getElementById('sheetMarginX').value = 50;
+            document.getElementById('valSheetMarginX').innerText = 50;
+            document.getElementById('rowGap').value = 15;
+            document.getElementById('valRowGap').innerText = 15;
+            document.getElementById('colGap').value = 15;
+            document.getElementById('valColGap').innerText = 15;
             saveToLocalStorage();
+            redrawAll();
+            showToast("Applied Compact Grid Preset");
         });
 
         document.getElementById('presetSpacious').addEventListener('click', () => {
-            document.getElementById('columnLayout').value = "2";
-            document.getElementById('sheetMarginY').value = "150";
-            document.getElementById('sheetMarginX').value = "120";
-            document.getElementById('valMarginY').innerText = "150";
-            document.getElementById('valMarginX').innerText = "120";
-            saveState();
-            redrawAll();
+            sheetProps.columns = 2;
+            sheetProps.marginTopY = 120;
+            sheetProps.marginRowX = 100;
+            sheetProps.rowGap = 40;
+            sheetProps.colGap = 35;
+            globalLayout.caseS = 120;
+            globalLayout.algW = 280;
+            globalLayout.algH = 80;
+            globalLayout.algX = 150;
+            document.getElementById('columnLayout').value = 2;
+            document.getElementById('sheetMarginY').value = 120;
+            document.getElementById('valSheetMarginY').innerText = 120;
+            document.getElementById('sheetMarginX').value = 100;
+            document.getElementById('valSheetMarginX').innerText = 100;
+            document.getElementById('rowGap').value = 40;
+            document.getElementById('valRowGap').innerText = 40;
+            document.getElementById('colGap').value = 35;
+            document.getElementById('valColGap').innerText = 35;
             saveToLocalStorage();
+            redrawAll();
+            showToast("Applied Spacious Study Preset");
         });
 
-        // Hook up Sheet Sliders
-        ['sheetMarginY', 'sheetMarginX', 'gridCaseX', 'gridCaseY', 'gridCaseSize', 'gridAlgH'].forEach(id => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.addEventListener('input', (e) => {
+        document.getElementById('sheetTitle').addEventListener('input', (e) => {
+            sheetProps.title = e.target.value;
+            saveToLocalStorage();
+            redrawAll();
+        });
+
+        document.getElementById('sheetSubtitle').addEventListener('input', (e) => {
+            sheetProps.subtitle = e.target.value;
+            saveToLocalStorage();
+            redrawAll();
+        });
+
+        document.getElementById('columnLayout').addEventListener('change', (e) => {
+            sheetProps.columns = parseInt(e.target.value);
+            saveToLocalStorage();
+            redrawAll();
+        });
+
+        document.getElementById('sheetTheme').addEventListener('change', (e) => {
+            sheetProps.theme = e.target.value;
+            saveToLocalStorage();
+            redrawAll();
+        });
+
+        const ogSliders = [
+            { id: 'sheetMarginY', prop: 'marginTopY' },
+            { id: 'sheetMarginX', prop: 'marginRowX' },
+            { id: 'rowGap', prop: 'rowGap' },
+            { id: 'colGap', prop: 'colGap' }
+        ];
+
+        ogSliders.forEach(s => {
+            document.getElementById(s.id).addEventListener('input', (e) => {
                 const val = parseFloat(e.target.value);
-                const valSpan = document.getElementById('val' + id.charAt(0).toUpperCase() + id.slice(1));
-                if (valSpan) valSpan.innerText = val;
-                if (selectedIndex !== null && casesData[selectedIndex]) {
-                    if (id === 'gridCaseX') casesData[selectedIndex].caseX = val;
-                    if (id === 'gridCaseY') casesData[selectedIndex].caseY = val;
-                    if (id === 'gridCaseSize') casesData[selectedIndex].caseSize = val;
-                    if (id === 'gridAlgH') casesData[selectedIndex].algH = val;
-                }
-                redrawAll();
+                document.getElementById('val' + s.id.charAt(0).toUpperCase() + s.id.slice(1)).innerText = val;
+                sheetProps[s.prop] = val;
                 saveToLocalStorage();
+                redrawAll();
             });
         });
 
-        // Fine sliders
-        ['fineSliderX', 'fineSliderY', 'fineSliderW', 'fineSliderH'].forEach((id, i) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.addEventListener('input', (e) => {
+        const p1Sliders = [
+            { id: 'gridCaseS', prop: 'caseS' },
+            { id: 'gridCaseX', prop: 'caseX' },
+            { id: 'gridCaseY', prop: 'caseY' },
+            { id: 'gridAlgW', prop: 'algW' },
+            { id: 'gridAlgH', prop: 'algH' },
+            { id: 'gridAlgX', prop: 'algX' }
+        ];
+
+        p1Sliders.forEach(s => {
+            document.getElementById(s.id).addEventListener('input', (e) => {
                 const val = parseFloat(e.target.value);
-                document.getElementById('val' + id.charAt(0).toUpperCase() + id.slice(1)).innerText = val;
-                if (selectedIndex !== null && casesData[selectedIndex]) {
-                    const objs = casesData[selectedIndex].fineCustomObjects;
-                    if (selectedFineObjIndex !== null && objs[selectedFineObjIndex]) {
-                        const obj = objs[selectedFineObjIndex];
-                        if (i === 0) obj.x = val;
-                        if (i === 1) obj.y = val;
-                        if (i === 2) obj.w = val;
-                        if (i === 3) obj.h = val;
-                        redrawAll();
-                        saveToLocalStorage();
-                    }
-                }
+                document.getElementById('val' + s.id.charAt(0).toUpperCase() + s.id.slice(1)).innerText = val;
+                globalLayout[s.prop] = val;
+                
+                casesData.forEach(c => {
+                    c.layoutCase.w = c.layoutCase.h = globalLayout.caseS;
+                    c.layoutCase.x = globalLayout.caseX;
+                    c.layoutCase.y = globalLayout.caseY;
+                    c.layoutAlg.w = globalLayout.algW;
+                    c.layoutAlg.h = globalLayout.algH;
+                    c.layoutAlg.x = globalLayout.algX;
+                });
+                saveToLocalStorage();
+                redrawAll();
             });
-        });
-
-        document.getElementById('fineTextInput').addEventListener('input', (e) => {
-            if (selectedIndex !== null && selectedFineObjIndex !== null) {
-                const obj = casesData[selectedIndex].fineCustomObjects[selectedFineObjIndex];
-                if (obj && obj.type === 'text') {
-                    obj.text = e.target.value;
-                    redrawAll();
-                    saveToLocalStorage();
-                }
-            }
-        });
-
-        document.getElementById('fineTextColor').addEventListener('input', (e) => {
-            if (selectedIndex !== null && selectedFineObjIndex !== null) {
-                const obj = casesData[selectedIndex].fineCustomObjects[selectedFineObjIndex];
-                if (obj && obj.type === 'text') {
-                    obj.color = e.target.value;
-                    redrawAll();
-                    saveToLocalStorage();
-                }
-            }
-        });
-
-        document.getElementById('fineFontSizeSlider').addEventListener('input', (e) => {
-            const val = parseInt(e.target.value);
-            document.getElementById('valFineFontSize').innerText = val;
-            if (selectedIndex !== null && selectedFineObjIndex !== null) {
-                const obj = casesData[selectedIndex].fineCustomObjects[selectedFineObjIndex];
-                if (obj && obj.type === 'text') {
-                    obj.fontSize = val;
-                    redrawAll();
-                    saveToLocalStorage();
-                }
-            }
-        });
-
-        function saveState() {
-            const stateSnapshot = JSON.parse(JSON.stringify(casesData));
-            historyStack.push(stateSnapshot);
-            if (historyStack.length > 30) historyStack.shift();
-            redoStack = [];
-        }
-
-        document.getElementById('undoBtn').addEventListener('click', () => {
-            if (historyStack.length <= 1) return;
-            redoStack.push(historyStack.pop());
-            casesData = JSON.parse(JSON.stringify(historyStack[historyStack.length - 1]));
-            updateAllThumbnails();
-            updateFineSliders();
-            redrawAll();
-            saveToLocalStorage();
-        });
-
-        document.getElementById('redoBtn').addEventListener('click', () => {
-            if (redoStack.length === 0) return;
-            const nextState = redoStack.pop();
-            historyStack.push(nextState);
-            casesData = JSON.parse(JSON.stringify(nextState));
-            updateAllThumbnails();
-            updateFineSliders();
-            redrawAll();
-            saveToLocalStorage();
-        });
-
-        document.getElementById('reverseOrderBtn').addEventListener('click', () => {
-            casesData.reverse();
-            saveState();
-            updateAllThumbnails();
-            redrawAll();
-            saveToLocalStorage();
         });
 
         document.getElementById('clearAllBtn').addEventListener('click', () => {
-            showModal("Clear All Cases", "Are you sure you want to clear all uploaded cases?", () => {
-                casesData = [];
-                selectedIndex = null;
-                saveState();
-                updateAllThumbnails();
-                redrawAll();
-                saveToLocalStorage();
-            });
+            casesData = []; selectedIndex = null; selectedFreeIndex = null; activeFineObj = null;
+            saveToLocalStorage();
+            updateThumbnails(); updateGroupsUI(); redrawAll();
+            showToast("Cleared all cases");
         });
 
-        document.getElementById('resetEverythingBtn').addEventListener('click', () => {
-            showModal("Factory Reset", "This will wipe all data, images, and local storage. Proceed?", () => {
-                localStorage.removeItem('pll_sheet_studio_ultimate_v2');
-                casesData = [];
-                selectedIndex = null;
-                location.reload();
-            });
-        });
-
-        document.getElementById('assignGroupBtn').addEventListener('click', () => {
-            if (selectedIndex !== null && casesData[selectedIndex]) {
-                const gName = document.getElementById('groupNameInput').value.trim() || 'General';
-                casesData[selectedIndex].group = gName;
-                saveState();
-                updateAllThumbnails();
-                redrawAll();
-                saveToLocalStorage();
+        ['reverseOrderBtn', 'reverseOrderBtn2', 'reverseOrderBtn3'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    casesData.reverse();
+                    if (selectedIndex !== null) {
+                        selectedIndex = casesData.length - 1 - selectedIndex;
+                        selectedFreeIndex = selectedIndex;
+                    }
+                    saveToLocalStorage();
+                    updateThumbnails(); redrawAll();
+                    showToast("Reversed cases order");
+                });
             }
         });
 
-        document.getElementById('addBoxBtn').addEventListener('click', () => {
-            if (selectedIndex === null || !casesData[selectedIndex]) return;
-            casesData[selectedIndex].fineCustomObjects.push({
-                type: 'box',
-                x: 100, y: 350, w: 200, h: 80,
-                color: '#10b981'
+        function updateFineSlidersBounds() {
+            if (selectedIndex === null || !casesData[selectedIndex] || !activeFineObj) return;
+            const img = casesData[selectedIndex].img;
+            
+            document.getElementById('fineSliderX').max = img.width;
+            document.getElementById('fineSliderY').max = img.height;
+            document.getElementById('fineSliderW').max = img.width;
+            document.getElementById('fineSliderH').max = img.height;
+            
+            updateFineSliderValues();
+            document.getElementById('deleteFineItemBtn').disabled = (activeFineObj.id === 'cropCase' || activeFineObj.id === 'cropAlg');
+
+            const textGroup = document.getElementById('textAnnotationGroup');
+            if (activeFineObj && activeFineObj.type === 'text') {
+                textGroup.style.display = 'block';
+                document.getElementById('annotationTextInput').value = activeFineObj.text || '';
+                document.getElementById('annotationColorInput').value = activeFineObj.color || '#f44336';
+                document.getElementById('annotationFontSizeSlider').value = activeFineObj.fontSize || 24;
+                document.getElementById('valFontSize').innerText = activeFineObj.fontSize || 24;
+            } else {
+                textGroup.style.display = 'none';
+            }
+        }
+
+        function updateFineSliderValues() {
+            if (!activeFineObj) return;
+            document.getElementById('fineSliderX').value = activeFineObj.x;
+            document.getElementById('fineSliderY').value = activeFineObj.y;
+            document.getElementById('fineSliderW').value = activeFineObj.w;
+            document.getElementById('fineSliderH').value = activeFineObj.h;
+            
+            document.getElementById('valFineX').innerText = Math.round(activeFineObj.x);
+            document.getElementById('valFineY').innerText = Math.round(activeFineObj.y);
+            document.getElementById('valFineW').innerText = Math.round(activeFineObj.w);
+            document.getElementById('valFineH').innerText = Math.round(activeFineObj.h);
+        }
+
+        ['X', 'Y', 'W', 'H'].forEach(prop => {
+            document.getElementById('fineSlider' + prop).addEventListener('input', (e) => {
+                if(activeFineObj) {
+                    activeFineObj[prop.toLowerCase()] = parseFloat(e.target.value);
+                    document.getElementById('valFine' + prop).innerText = activeFineObj[prop.toLowerCase()];
+                    saveToLocalStorage();
+                    redrawAll();
+                }
             });
-            selectedFineObjIndex = casesData[selectedIndex].fineCustomObjects.length - 1;
-            saveState();
-            updateFineSliders();
-            redrawAll();
+        });
+
+        document.getElementById('annotationTextInput').addEventListener('input', (e) => {
+            if (activeFineObj && activeFineObj.type === 'text') {
+                activeFineObj.text = e.target.value;
+                saveToLocalStorage();
+                redrawAll();
+            }
+        });
+
+        document.getElementById('annotationColorInput').addEventListener('input', (e) => {
+            if (activeFineObj && activeFineObj.type === 'text') {
+                activeFineObj.color = e.target.value;
+                saveToLocalStorage();
+                redrawAll();
+            }
+        });
+
+        document.getElementById('annotationFontSizeSlider').addEventListener('input', (e) => {
+            if (activeFineObj && activeFineObj.type === 'text') {
+                activeFineObj.fontSize = parseFloat(e.target.value);
+                document.getElementById('valFontSize').innerText = activeFineObj.fontSize;
+                saveToLocalStorage();
+                redrawAll();
+            }
+        });
+
+        document.getElementById('applyCropToAllBtn').addEventListener('click', () => {
+            if(selectedIndex === null || !casesData[selectedIndex]) return;
+            const refCase = casesData[selectedIndex];
+            casesData.forEach(c => {
+                c.cropCase = JSON.parse(JSON.stringify(refCase.cropCase));
+                c.cropAlg = JSON.parse(JSON.stringify(refCase.cropAlg));
+            });
             saveToLocalStorage();
+            showToast("Applied active crop box to all cases.");
+            redrawAll();
+        });
+
+        document.getElementById('addBoxBtn').addEventListener('click', () => {
+            if(selectedIndex === null || !casesData[selectedIndex]) return;
+            const c = casesData[selectedIndex];
+            const newObj = { type: 'box', color: '#ffeb3b', x: c.cropCase.x, y: c.cropCase.y, w: c.cropCase.w / 2, h: c.cropCase.h / 2 };
+            c.extraObjs.push(newObj);
+            activeFineObj = newObj;
+            saveToLocalStorage();
+            updateFineSlidersBounds(); redrawAll();
         });
 
         document.getElementById('addTextBtn').addEventListener('click', () => {
-            if (selectedIndex === null || !casesData[selectedIndex]) return;
-            casesData[selectedIndex].fineCustomObjects.push({
-                type: 'text',
-                x: 80, y: 120, w: 250, h: 45,
-                text: 'Section Label',
-                fontSize: 22,
-                color: '#000000'
-            });
-            selectedFineObjIndex = casesData[selectedIndex].fineCustomObjects.length - 1;
-            saveState();
-            updateFineSliders();
-            redrawAll();
+            if(selectedIndex === null || !casesData[selectedIndex]) return;
+            const c = casesData[selectedIndex];
+            const newObj = { type: 'text', color: '#f44336', text: 'Important', fontSize: Math.round(c.cropCase.h * 0.3), x: c.cropCase.x, y: c.cropCase.y, w: c.cropCase.w, h: c.cropCase.h * 0.5 };
+            c.extraObjs.push(newObj);
+            activeFineObj = newObj;
             saveToLocalStorage();
+            updateFineSlidersBounds(); redrawAll();
+        });
+
+        document.getElementById('deleteFineItemBtn').addEventListener('click', () => {
+            if(selectedIndex !== null && casesData[selectedIndex] && activeFineObj && activeFineObj.id !== 'cropCase' && activeFineObj.id !== 'cropAlg') {
+                const c = casesData[selectedIndex];
+                c.extraObjs = c.extraObjs.filter(o => o !== activeFineObj);
+                activeFineObj = c.cropCase;
+                saveToLocalStorage();
+                updateFineSlidersBounds(); redrawAll();
+            }
+        });
+
+        document.getElementById('moveUpBtn').addEventListener('click', () => {
+            if (selectedIndex !== null && selectedIndex > 0) {
+                const temp = casesData[selectedIndex];
+                casesData[selectedIndex] = casesData[selectedIndex - 1];
+                casesData[selectedIndex - 1] = temp;
+                selectedIndex--;
+                selectedFreeIndex = selectedIndex;
+                saveToLocalStorage();
+                updateThumbnails();
+                redrawAll();
+                showToast("Moved case up");
+            }
+        });
+
+        document.getElementById('moveDownBtn').addEventListener('click', () => {
+            if (selectedIndex !== null && selectedIndex < casesData.length - 1) {
+                const temp = casesData[selectedIndex];
+                casesData[selectedIndex] = casesData[selectedIndex + 1];
+                casesData[selectedIndex + 1] = temp;
+                selectedIndex++;
+                selectedFreeIndex = selectedIndex;
+                saveToLocalStorage();
+                updateThumbnails();
+                redrawAll();
+                showToast("Moved case down");
+            }
         });
 
         const fineCanvas = document.getElementById('fineCanvas');
+        
         function getHandles(b) {
             return {
                 nw: { x: b.x, y: b.y },
@@ -788,527 +1225,630 @@
 
         fineCanvas.addEventListener('mousedown', (e) => {
             if (selectedIndex === null || !casesData[selectedIndex]) return;
+            const c = casesData[selectedIndex];
+            if (!activeFineObj) activeFineObj = c.cropCase;
+
             const rect = fineCanvas.getBoundingClientRect();
             const scaleX = fineCanvas.width / rect.width;
             const scaleY = fineCanvas.height / rect.height;
-            startX = (e.clientX - rect.left) * scaleX;
-            startY = (e.clientY - rect.top) * scaleY;
+            const mx = (e.clientX - rect.left) * scaleX;
+            const my = (e.clientY - rect.top) * scaleY;
 
-            resizingHandle = null;
-            isDraggingObj = false;
+            const imgX = (mx - fineOffsetX) / fineScale;
+            const imgY = (my - fineOffsetY) / fineScale;
 
-            const objs = casesData[selectedIndex].fineCustomObjects;
-            if (selectedFineObjIndex !== null && objs[selectedFineObjIndex]) {
-                const b = objs[selectedFineObjIndex];
-                const handles = getHandles(b);
+            fineResizingHandle = null;
+            isDraggingFine = false;
+
+            if (activeFineObj) {
+                let targetBox = activeFineObj === c.cropCase ? c.cropCase : (activeFineObj === c.cropAlg ? c.cropAlg : activeFineObj);
+                const handles = getHandles(targetBox);
                 for (let hKey in handles) {
                     const h = handles[hKey];
-                    if (Math.abs(startX - h.x) <= handleSize && Math.abs(startY - h.y) <= handleSize) {
-                        resizingHandle = hKey;
+                    const hSizeImg = handleSize / fineScale;
+                    if (Math.abs(imgX - h.x) <= hSizeImg && Math.abs(imgY - h.y) <= hSizeImg) {
+                        fineResizingHandle = hKey;
                         return;
                     }
                 }
-                if (startX >= b.x && startX <= b.x + b.w && startY >= b.y && startY <= b.y + b.h) {
-                    isDraggingObj = true;
-                    dragOffsetX = startX - b.x;
-                    dragOffsetY = startY - b.y;
-                    return;
-                }
             }
 
-            const hitIdx = objs.findIndex(b => startX >= b.x && startX <= b.x + b.w && startY >= b.y && startY <= b.y + b.h);
-            if (hitIdx !== -1) {
-                selectedFineObjIndex = hitIdx;
-                isDraggingObj = true;
-                dragOffsetX = startX - objs[hitIdx].x;
-                dragOffsetY = startY - objs[hitIdx].y;
-            } else {
-                selectedFineObjIndex = null;
+            let hit = null;
+            for(let i = c.extraObjs.length - 1; i >= 0; i--) {
+                const o = c.extraObjs[i];
+                if(imgX >= o.x && imgX <= o.x + o.w && imgY >= o.y && imgY <= o.y + o.h) {
+                    hit = o; break;
+                }
             }
-            document.getElementById('deleteFineItemBtn').disabled = selectedFineObjIndex === null;
-            updateFineSliders();
+            if(!hit) {
+                if(imgX >= c.cropCase.x && imgX <= c.cropCase.x + c.cropCase.w && imgY >= c.cropCase.y && imgY <= c.cropCase.y + c.cropCase.h) hit = c.cropCase;
+                else if(imgX >= c.cropAlg.x && imgX <= c.cropAlg.x + c.cropAlg.w && imgY >= c.cropAlg.y && imgY <= c.cropAlg.y + c.cropAlg.h) hit = c.cropAlg;
+            }
+
+            if(hit) {
+                activeFineObj = hit;
+                isDraggingFine = true;
+                fineDragStartX = imgX - hit.x;
+                fineDragStartY = imgY - hit.y;
+                updateFineSlidersBounds();
+            } else {
+                activeFineObj = null;
+                document.getElementById('deleteFineItemBtn').disabled = true;
+            }
             redrawAll();
         });
 
         fineCanvas.addEventListener('mousemove', (e) => {
-            if (!isDraggingObj && !resizingHandle) return;
-            if (selectedIndex === null || !casesData[selectedIndex]) return;
+            if ((!isDraggingFine && !fineResizingHandle) || selectedIndex === null || !casesData[selectedIndex]) return;
             const rect = fineCanvas.getBoundingClientRect();
             const scaleX = fineCanvas.width / rect.width;
             const scaleY = fineCanvas.height / rect.height;
-            const currentX = (e.clientX - rect.left) * scaleX;
-            const currentY = (e.clientY - rect.top) * scaleY;
+            const mx = (e.clientX - rect.left) * scaleX;
+            const my = (e.clientY - rect.top) * scaleY;
+            const imgX = (mx - fineOffsetX) / fineScale;
+            const imgY = (my - fineOffsetY) / fineScale;
 
-            const objs = casesData[selectedIndex].fineCustomObjects;
-            if (resizingHandle && selectedFineObjIndex !== null) {
-                const b = objs[selectedFineObjIndex];
-                let x2 = b.x + b.w;
-                let y2 = b.y + b.h;
-                if (resizingHandle.includes('w')) b.x = currentX;
-                if (resizingHandle.includes('e')) x2 = currentX;
-                if (resizingHandle.includes('n')) b.y = currentY;
-                if (resizingHandle.includes('s')) y2 = currentY;
-                b.w = x2 - b.x;
-                b.h = y2 - b.y;
-                if (b.w < 10) b.w = 10;
-                if (b.h < 10) b.h = 10;
-                updateFineSliders();
+            if (fineResizingHandle && activeFineObj) {
+                let targetBox = activeFineObj;
+                let x2 = targetBox.x + targetBox.w;
+                let y2 = targetBox.y + targetBox.h;
+                if (fineResizingHandle.includes('w')) targetBox.x = imgX;
+                if (fineResizingHandle.includes('e')) x2 = imgX;
+                if (fineResizingHandle.includes('n')) targetBox.y = imgY;
+                if (fineResizingHandle.includes('s')) y2 = imgY;
+                targetBox.w = x2 - targetBox.x;
+                targetBox.h = y2 - targetBox.y;
+                if (targetBox.w < 10) targetBox.w = 10;
+                if (targetBox.h < 10) targetBox.h = 10;
+                
+                updateFineSliderValues(); 
+                saveToLocalStorage();
                 redrawAll();
-            } else if (isDraggingObj && selectedFineObjIndex !== null) {
-                const b = objs[selectedFineObjIndex];
-                b.x = currentX - dragOffsetX;
-                b.y = currentY - dragOffsetY;
-                updateFineSliders();
+            } else if (isDraggingFine && activeFineObj) {
+                activeFineObj.x = imgX - fineDragStartX;
+                activeFineObj.y = imgY - fineDragStartY;
+                updateFineSliderValues(); 
+                saveToLocalStorage();
                 redrawAll();
             }
         });
 
         window.addEventListener('mouseup', () => {
-            if (isDraggingObj || resizingHandle) {
-                saveState();
+            isDraggingFine = false; fineResizingHandle = null;
+            if (activeFreeDragMode || freeResizingHandle) {
                 saveToLocalStorage();
             }
-            isDraggingObj = false;
-            resizingHandle = null;
+            activeFreeDragMode = null; freeResizingHandle = null;
         });
 
-        document.getElementById('deleteFineItemBtn').addEventListener('click', () => {
-            if (selectedIndex !== null && selectedFineObjIndex !== null) {
-                const objs = casesData[selectedIndex].fineCustomObjects;
-                objs.splice(selectedFineObjIndex, 1);
-                selectedFineObjIndex = objs.length > 0 ? 0 : null;
-                document.getElementById('deleteFineItemBtn').disabled = selectedFineObjIndex === null;
-                saveState();
-                updateFineSliders();
-                redrawAll();
-                saveToLocalStorage();
-            }
-        });
-
-        document.getElementById('applyToAllFineBtn').addEventListener('click', () => {
-            if (selectedIndex === null || casesData.length === 0) return;
-            const templateObjects = JSON.parse(JSON.stringify(casesData[selectedIndex].fineCustomObjects));
-            casesData.forEach(item => {
-                item.fineCustomObjects = JSON.parse(JSON.stringify(templateObjects));
-            });
-            saveState();
-            redrawAll();
-            saveToLocalStorage();
-        });
-
-        // Freeform canvas handling
         const freeCanvas = document.getElementById('freeCanvas');
-        let isDraggingFreeBlock = false;
-        let freeResizingHandle = null;
-        let selectedFreeIndex = null;
-        let freeDragOffX = 0, freeDragOffY = 0;
+
+        document.getElementById('syncBlockLayoutBtn').addEventListener('click', () => {
+            if (selectedFreeIndex !== null && casesData[selectedFreeIndex]) {
+                const ref = casesData[selectedFreeIndex];
+                casesData.forEach(c => {
+                    c.layoutCase = JSON.parse(JSON.stringify(ref.layoutCase));
+                    c.layoutAlg = JSON.parse(JSON.stringify(ref.layoutAlg));
+                    c.freeBlock.w = ref.freeBlock.w;
+                    c.freeBlock.h = ref.freeBlock.h;
+                });
+                saveToLocalStorage();
+                showToast("Applied internal mini-block layout to all cases.");
+                redrawAll();
+            }
+        });
+
+        document.getElementById('resetFreeformPositionsBtn').addEventListener('click', () => {
+            casesData.forEach((c, i) => {
+                c.freeBlock.x = 80 + ((i % 2) * 540);
+                c.freeBlock.y = 180 + (Math.floor(i / 2) * 140);
+            });
+            saveToLocalStorage();
+            redrawAll();
+            showToast("Auto-arranged freeform blocks");
+        });
 
         freeCanvas.addEventListener('mousedown', (e) => {
             const rect = freeCanvas.getBoundingClientRect();
-            const scaleX = freeCanvas.width / rect.width;
-            const scaleY = freeCanvas.height / rect.height;
-            const cx = (e.clientX - rect.left) * scaleX;
-            const cy = (e.clientY - rect.top) * scaleY;
+            const mx = (e.clientX - rect.left) * (freeCanvas.width / rect.width);
+            const my = (e.clientY - rect.top) * (freeCanvas.height / rect.height);
 
             freeResizingHandle = null;
-            isDraggingFreeBlock = false;
+            activeFreeDragMode = null;
 
             if (selectedFreeIndex !== null && casesData[selectedFreeIndex]) {
                 const c = casesData[selectedFreeIndex];
-                const handles = getHandles({ x: c.freeX, y: c.freeY, w: c.freeW, h: c.freeH });
-                for (let hKey in handles) {
-                    const h = handles[hKey];
-                    if (Math.abs(cx - h.x) <= handleSize && Math.abs(cy - h.y) <= handleSize) {
-                        freeResizingHandle = hKey;
-                        return;
-                    }
-                }
+                
+                let hlC = getHandles({x: c.freeBlock.x + c.layoutCase.x, y: c.freeBlock.y + c.layoutCase.y, w: c.layoutCase.w, h: c.layoutCase.h});
+                for(let k in hlC) if(Math.abs(mx - hlC[k].x)<=handleSize && Math.abs(my - hlC[k].y)<=handleSize) { freeResizingHandle = {type:'layoutCase', handle:k}; return; }
+                
+                let hlA = getHandles({x: c.freeBlock.x + c.layoutAlg.x, y: c.freeBlock.y + c.layoutAlg.y, w: c.layoutAlg.w, h: c.layoutAlg.h});
+                for(let k in hlA) if(Math.abs(mx - hlA[k].x)<=handleSize && Math.abs(my - hlA[k].y)<=handleSize) { freeResizingHandle = {type:'layoutAlg', handle:k}; return; }
+                
+                let hlB = getHandles(c.freeBlock);
+                for(let k in hlB) if(Math.abs(mx - hlB[k].x)<=handleSize && Math.abs(my - hlB[k].y)<=handleSize) { freeResizingHandle = {type:'block', handle:k}; return; }
             }
 
-            const hit = casesData.findIndex(c => c.enabled && cx >= c.freeX && cx <= c.freeX + c.freeW && cy >= c.freeY && cy <= c.freeY + c.freeH);
-            if (hit !== -1) {
-                selectedFreeIndex = hit;
-                isDraggingFreeBlock = true;
-                freeDragOffX = cx - casesData[hit].freeX;
-                freeDragOffY = cy - casesData[hit].freeY;
-                redrawAll();
-            } else {
-                selectedFreeIndex = null;
-                redrawAll();
+            for(let i = casesData.length - 1; i >= 0; i--) {
+                const c = casesData[i];
+                if(!c.enabled) continue;
+
+                const bx = c.freeBlock.x, by = c.freeBlock.y;
+                if(mx >= bx+c.layoutCase.x && mx <= bx+c.layoutCase.x+c.layoutCase.w && my >= by+c.layoutCase.y && my <= by+c.layoutCase.y+c.layoutCase.h) {
+                    selectedFreeIndex = i; selectedIndex = i; activeFreeDragMode = 'layoutCase'; 
+                    freeDragOffX = mx - (bx + c.layoutCase.x); freeDragOffY = my - (by + c.layoutCase.y);
+                    updateThumbnails(); redrawAll(); return;
+                }
+                if(mx >= bx+c.layoutAlg.x && mx <= bx+c.layoutAlg.x+c.layoutAlg.w && my >= by+c.layoutAlg.y && my <= by+c.layoutAlg.y+c.layoutAlg.h) {
+                    selectedFreeIndex = i; selectedIndex = i; activeFreeDragMode = 'layoutAlg'; 
+                    freeDragOffX = mx - (bx + c.layoutAlg.x); freeDragOffY = my - (by + c.layoutAlg.y);
+                    updateThumbnails(); redrawAll(); return;
+                }
+                if(mx >= bx && mx <= bx+c.freeBlock.w && my >= by && my <= by+c.freeBlock.h) {
+                    selectedFreeIndex = i; selectedIndex = i; activeFreeDragMode = 'block';
+                    freeDragOffX = mx - bx; freeDragOffY = my - by;
+                    updateThumbnails(); redrawAll(); return;
+                }
             }
+            selectedFreeIndex = null; redrawAll();
         });
 
         freeCanvas.addEventListener('mousemove', (e) => {
-            if (!isDraggingFreeBlock && !freeResizingHandle) return;
+            if((!activeFreeDragMode && !freeResizingHandle) || selectedFreeIndex === null || !casesData[selectedFreeIndex]) return;
             const rect = freeCanvas.getBoundingClientRect();
-            const scaleX = freeCanvas.width / rect.width;
-            const scaleY = freeCanvas.height / rect.height;
-            const cx = (e.clientX - rect.left) * scaleX;
-            const cy = (e.clientY - rect.top) * scaleY;
+            const mx = (e.clientX - rect.left) * (freeCanvas.width / rect.width);
+            const my = (e.clientY - rect.top) * (freeCanvas.height / rect.height);
+            const c = casesData[selectedFreeIndex];
 
-            if (selectedFreeIndex !== null) {
-                const c = casesData[selectedFreeIndex];
-                if (freeResizingHandle) {
-                    let x2 = c.freeX + c.freeW;
-                    let y2 = c.freeY + c.freeH;
-                    if (freeResizingHandle.includes('w')) c.freeX = cx;
-                    if (freeResizingHandle.includes('e')) x2 = cx;
-                    if (freeResizingHandle.includes('n')) c.freeY = cy;
-                    if (freeResizingHandle.includes('s')) y2 = cy;
-                    c.freeW = x2 - c.freeX;
-                    c.freeH = y2 - c.freeY;
-                    if (c.freeW < 50) c.freeW = 50;
-                    if (c.freeH < 40) c.freeH = 40;
-                    redrawAll();
-                } else if (isDraggingFreeBlock) {
-                    c.freeX = cx - freeDragOffX;
-                    c.freeY = cy - freeDragOffY;
-                    redrawAll();
-                }
-            }
-        });
-
-        window.addEventListener('mouseup', () => {
-            if (isDraggingFreeBlock || freeResizingHandle) {
-                saveState();
+            if(freeResizingHandle) {
+                let target = null, ox=0, oy=0;
+                if(freeResizingHandle.type === 'block') { target = c.freeBlock; }
+                else if(freeResizingHandle.type === 'layoutCase') { target = c.layoutCase; ox = c.freeBlock.x; oy = c.freeBlock.y; }
+                else if(freeResizingHandle.type === 'layoutAlg') { target = c.layoutAlg; ox = c.freeBlock.x; oy = c.freeBlock.y; }
+                
+                let x2 = target.x + ox + target.w;
+                let y2 = target.y + oy + target.h;
+                const h = freeResizingHandle.handle;
+                
+                if (h.includes('w')) target.x = mx - ox;
+                if (h.includes('e')) x2 = mx;
+                if (h.includes('n')) target.y = my - oy;
+                if (h.includes('s')) y2 = my;
+                
+                target.w = x2 - (target.x + ox);
+                target.h = y2 - (target.y + oy);
+                if(target.w < 20) target.w = 20; if(target.h < 20) target.h = 20;
                 saveToLocalStorage();
-            }
-            isDraggingFreeBlock = false;
-            freeResizingHandle = null;
-        });
-
-        document.getElementById('applyToAllFreeBtn').addEventListener('click', () => {
-            casesData.forEach((item, index) => {
-                item.freeX = 80 + ((index % 2) * 540);
-                item.freeY = 180 + (Math.floor(index / 2) * 140);
-                item.freeW = 480;
-                item.freeH = 110;
-            });
-            saveState();
-            redrawAll();
-            saveToLocalStorage();
-        });
-
-        // Canvas Rendering Functions
-        function drawGridSheet(ctxTarget) {
-            const theme = document.getElementById('sheetTheme').value;
-            ctxTarget.fillStyle = theme === 'dark' ? '#18181b' : (theme === 'parchment' ? '#fdfbf7' : '#ffffff');
-            ctxTarget.fillRect(0, 0, ctxTarget.canvas.width, ctxTarget.canvas.height);
-
-            const title = document.getElementById('sheetTitle').value || 'Algorithm Sheet';
-            const subtitle = document.getElementById('sheetSubtitle').value || '';
-            const marginY = parseInt(document.getElementById('sheetMarginY').value) || 100;
-            const marginX = parseInt(document.getElementById('sheetMarginX').value) || 80;
-
-            const textColor = theme === 'dark' ? '#f4f4f5' : '#09090b';
-            const subColor = theme === 'dark' ? '#a1a1aa' : '#52525b';
-
-            ctxTarget.fillStyle = textColor;
-            ctxTarget.font = 'bold 44px sans-serif';
-            ctxTarget.textAlign = 'center';
-            ctxTarget.fillText(title, ctxTarget.canvas.width / 2, marginY);
-
-            if (subtitle) {
-                ctxTarget.fillStyle = subColor;
-                ctxTarget.font = '16px sans-serif';
-                ctxTarget.fillText(subtitle, ctxTarget.canvas.width / 2, marginY + 30);
-            }
-
-            ctxTarget.strokeStyle = theme === 'dark' ? '#3f3f46' : '#e4e4e7';
-            ctxTarget.lineWidth = 3;
-            ctxTarget.beginPath();
-            ctxTarget.moveTo(marginX, marginY + 50);
-            ctxTarget.lineTo(ctxTarget.canvas.width - marginX, marginY + 50);
-            ctxTarget.stroke();
-
-            const activeCases = casesData.filter(c => c.enabled);
-            const columns = parseInt(document.getElementById('columnLayout').value);
-            let usableWidth = ctxTarget.canvas.width - (marginX * 2);
-            let colWidth = usableWidth / columns;
-            let rowHeight = 130;
-            let startY = marginY + 80;
-
-            const groups = {};
-            activeCases.forEach(item => {
-                const g = item.group || 'General';
-                if (!groups[g]) groups[g] = [];
-                groups[g].push(item);
-            });
-
-            let currentGlobalIndex = 0;
-            for (let gName in groups) {
-                if (Object.keys(groups).length > 1 || gName !== 'General') {
-                    let rowIndex = Math.floor(currentGlobalIndex / columns);
-                    let headerY = startY + (rowIndex * rowHeight);
-                    
-                    ctxTarget.fillStyle = theme === 'dark' ? '#34d399' : '#059669';
-                    ctxTarget.font = 'bold 18px sans-serif';
-                    ctxTarget.textAlign = 'left';
-                    ctxTarget.fillText(`Section: ${gName}`, marginX, headerY);
-                    currentGlobalIndex += columns;
+                redrawAll();
+            } else if(activeFreeDragMode) {
+                if(activeFreeDragMode === 'block') {
+                    c.freeBlock.x = mx - freeDragOffX; c.freeBlock.y = my - freeDragOffY;
+                } else if(activeFreeDragMode === 'layoutCase') {
+                    c.layoutCase.x = mx - c.freeBlock.x - freeDragOffX; c.layoutCase.y = my - c.freeBlock.y - freeDragOffY;
+                } else if(activeFreeDragMode === 'layoutAlg') {
+                    c.layoutAlg.x = mx - c.freeBlock.x - freeDragOffX; c.layoutAlg.y = my - c.freeBlock.y - freeDragOffY;
                 }
+                saveToLocalStorage();
+                redrawAll();
+            }
+        });
 
-                groups[gName].forEach(item => {
-                    let colIndex = currentGlobalIndex % columns;
-                    let rowIndex = Math.floor(currentGlobalIndex / columns);
-                    let currentX = marginX + (colIndex * colWidth);
-                    let currentY = startY + (rowIndex * rowHeight);
+        function drawImageAspectFit(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) {
+            if (!sw || !sh || !dw || !dh) return;
+            const srcAspect = sw / sh;
+            const dstAspect = dw / dh;
+            
+            let drawW = dw;
+            let drawH = dh;
+            let offsetX = 0;
+            let offsetY = 0;
+            
+            if (srcAspect > dstAspect) {
+                drawH = dw / srcAspect;
+                offsetY = (dh - drawH) / 2;
+            } else {
+                drawW = dh * srcAspect;
+                offsetX = (dw - drawW) / 2;
+            }
+            
+            ctx.drawImage(img, sx, sy, sw, sh, dx + offsetX, dy + offsetY, drawW, drawH);
+        }
 
-                    const img = item.img;
-                    let displaySize = item.caseSize;
-
-                    ctxTarget.drawImage(
-                        img, 
-                        img.width * (item.caseX / 100), 
-                        img.height * (item.caseY / 100), 
-                        img.width * 0.15, 
-                        img.height * 0.15, 
-                        currentX, currentY, displaySize, displaySize
-                    );
-                    ctxTarget.strokeStyle = theme === 'dark' ? '#3f3f46' : '#d4d4d8';
-                    ctxTarget.lineWidth = 2;
-                    ctxTarget.strokeRect(currentX, currentY, displaySize, displaySize);
-
-                    ctxTarget.drawImage(
-                        img, 
-                        0, 0, img.width, img.height * 0.22, 
-                        currentX + displaySize + 15, currentY + 15, 
-                        colWidth - displaySize - 30, item.algH
-                    );
-
-                    if (item.fineCustomObjects) {
-                        item.fineCustomObjects.forEach(obj => {
-                            if (obj.type === 'text') {
-                                ctxTarget.fillStyle = obj.color || textColor;
-                                ctxTarget.font = `${obj.fontSize || 20}px sans-serif`;
-                                ctxTarget.textAlign = 'left';
-                                ctxTarget.fillText(obj.text, currentX + (obj.x - 80), currentY + (obj.y - 140));
-                            } else if (obj.type === 'box') {
-                                ctxTarget.strokeStyle = obj.color;
-                                ctxTarget.lineWidth = 2;
-                                ctxTarget.strokeRect(currentX + (obj.x - 80), currentY + (obj.y - 140), obj.w, obj.h);
-                            }
-                        });
-                    }
-
-                    currentGlobalIndex++;
-                });
+        function getThemeColors(theme) {
+            switch(theme) {
+                case 'cream': return { bg: '#fdfbf7', text: '#2c221e', border: '#d3c5b4', blockBg: '#fffdf9' };
+                case 'dark': return { bg: '#121212', text: '#f0f0f0', border: '#333333', blockBg: '#1e1e1e' };
+                case 'blueprint': return { bg: '#0d233a', text: '#ffffff', border: '#1d3f66', blockBg: '#142c4c' };
+                default: return { bg: '#ffffff', text: '#000000', border: '#e0e0e0', blockBg: '#ffffff' };
             }
         }
 
-        function drawFineSheet(ctxTarget) {
-            ctxTarget.fillStyle = '#ffffff';
-            ctxTarget.fillRect(0, 0, ctxTarget.canvas.width, ctxTarget.canvas.height);
+        function drawGridSheet(ctx) {
+            const colors = getThemeColors(sheetProps.theme);
+            ctx.fillStyle = colors.bg;
+            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+            ctx.fillStyle = colors.text; 
+            ctx.font = 'bold 42px Arial'; 
+            ctx.textAlign = 'center';
+            ctx.fillText(sheetProps.title, ctx.canvas.width / 2, sheetProps.marginTopY - 35);
+            
+            if (sheetProps.subtitle) {
+                ctx.font = '16px Arial';
+                ctx.fillStyle = sheetProps.theme === 'dark' ? '#aaaaaa' : '#666666';
+                ctx.fillText(sheetProps.subtitle, ctx.canvas.width / 2, sheetProps.marginTopY - 10);
+            }
+
+            ctx.strokeStyle = colors.border; ctx.lineWidth = 2;
+            ctx.beginPath(); 
+            ctx.moveTo(sheetProps.marginRowX, sheetProps.marginTopY + 5); 
+            ctx.lineTo(ctx.canvas.width - sheetProps.marginRowX, sheetProps.marginTopY + 5); 
+            ctx.stroke();
+
+            const activeCases = casesData.filter(c => c.enabled);
+            const cols = sheetProps.columns;
+            let marginX = sheetProps.marginRowX;
+            let currentY = sheetProps.marginTopY + 25;
+
+            // Group cases by category
+            const groupedCases = {};
+            groupsData.forEach(g => { groupedCases[g] = []; });
+            activeCases.forEach(item => {
+                const cat = item.category && groupsData.includes(item.category) ? item.category : 'General';
+                if (!groupedCases[cat]) groupedCases[cat] = [];
+                groupedCases[cat].push(item);
+            });
+
+            groupsData.forEach(groupName => {
+                const groupItems = groupedCases[groupName];
+                if (!groupItems || groupItems.length === 0) return;
+
+                // Render group header / subtitle automatically on the sheet
+                currentY += 15;
+                ctx.fillStyle = colors.text;
+                ctx.font = 'bold 22px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText(`📁 Group: ${groupName}`, marginX, currentY);
+                
+                currentY += 10;
+                ctx.strokeStyle = colors.border;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(marginX, currentY);
+                ctx.lineTo(ctx.canvas.width - marginX, currentY);
+                ctx.stroke();
+                currentY += 15;
+
+                let colW = (ctx.canvas.width - (marginX * 2) - (cols - 1) * sheetProps.colGap) / cols;
+                let rowH = Math.max(globalLayout.caseS, globalLayout.algH) + Math.max(globalLayout.caseY, 25) + 15;
+                let numRows = Math.ceil(groupItems.length / cols);
+
+                groupItems.forEach((item, index) => {
+                    let col = index % cols, row = Math.floor(index / cols);
+                    let bx = marginX + (col * (colW + sheetProps.colGap));
+                    let by = currentY + (row * (rowH + sheetProps.rowGap));
+
+                    ctx.fillStyle = colors.blockBg;
+                    ctx.fillRect(bx, by, colW, rowH);
+                    ctx.strokeStyle = colors.border; ctx.lineWidth = 1;
+                    ctx.strokeRect(bx, by, colW, rowH);
+
+                    // Draw Case Picture
+                    if(item.cropCase.w > 0 && item.cropCase.h > 0) {
+                        drawImageAspectFit(ctx, item.img, item.cropCase.x, item.cropCase.y, item.cropCase.w, item.cropCase.h, 
+                                    bx + item.layoutCase.x, by + item.layoutCase.y, item.layoutCase.w, item.layoutCase.h);
+                        ctx.strokeStyle = colors.border; ctx.lineWidth = 1;
+                        ctx.strokeRect(bx + item.layoutCase.x, by + item.layoutCase.y, item.layoutCase.w, item.layoutCase.h);
+                    }
+
+                    // Draw Alg Picture
+                    if(item.cropAlg.w > 0 && item.cropAlg.h > 0) {
+                        drawImageAspectFit(ctx, item.img, item.cropAlg.x, item.cropAlg.y, item.cropAlg.w, item.cropAlg.h, 
+                                    bx + item.layoutAlg.x, by + item.layoutAlg.y, item.layoutAlg.w, item.layoutAlg.h);
+                    }
+
+                    // Draw Extra Annotations / Text strictly ON TOP OF THE CASE PICTURE
+                    if (item.extraObjs && item.extraObjs.length > 0 && item.cropCase.w > 0 && item.cropCase.h > 0) {
+                        const sx = item.cropCase.x, sy = item.cropCase.y, sw = item.cropCase.w, sh = item.cropCase.h;
+                        const dx = bx + item.layoutCase.x, dy = by + item.layoutCase.y, dw = item.layoutCase.w, dh = item.layoutCase.h;
+                        const srcAspect = sw / sh;
+                        const dstAspect = dw / dh;
+                        let drawW = dw, drawH = dh;
+                        let offsetX = 0, offsetY = 0;
+                        if (srcAspect > dstAspect) {
+                            drawH = dw / srcAspect;
+                            offsetY = (dh - drawH) / 2;
+                        } else {
+                            drawW = dh * srcAspect;
+                            offsetX = (dw - drawW) / 2;
+                        }
+                        const scale = drawW / sw;
+
+                        item.extraObjs.forEach(obj => {
+                            const ox = dx + offsetX + (obj.x - sx) * scale;
+                            const oy = dy + offsetY + (obj.y - sy) * scale;
+                            const ow = obj.w * scale;
+                            const oh = obj.h * scale;
+
+                            if (obj.type === 'box') {
+                                ctx.strokeStyle = obj.color || '#ffeb3b';
+                                ctx.lineWidth = 2;
+                                ctx.strokeRect(ox, oy, ow, oh);
+                            } else if (obj.type === 'text') {
+                                ctx.fillStyle = obj.color || '#f44336';
+                                const fontSz = (obj.fontSize || 24) * scale;
+                                ctx.font = `bold ${Math.max(10, fontSz)}px Arial`;
+                                ctx.textAlign = 'left';
+                                ctx.textBaseline = 'top';
+                                ctx.fillText(obj.text || '', ox, oy);
+                            }
+                        });
+                    }
+                });
+
+                currentY += (numRows * (rowH + sheetProps.rowGap)) + 10;
+            });
+        }
+
+        function drawGroupsSheet(ctx) {
+            drawGridSheet(ctx);
+        }
+
+        function drawFineSheet(ctx) {
+            ctx.fillStyle = '#222';
+            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
             if (selectedIndex === null || !casesData[selectedIndex]) {
-                ctxTarget.fillStyle = '#71717a';
-                ctxTarget.font = '20px sans-serif';
-                ctxTarget.textAlign = 'center';
-                ctxTarget.fillText('Select a case from the sidebar to fine-tune', ctxTarget.canvas.width / 2, ctxTarget.canvas.height / 2);
+                ctx.fillStyle = '#888'; ctx.font = '24px Arial'; ctx.textAlign = 'center';
+                ctx.fillText('Select an image from the sidebar to start extracting', ctx.canvas.width/2, ctx.canvas.height/2);
                 return;
             }
 
             const item = casesData[selectedIndex];
             const img = item.img;
 
-            let scaleFactor = 0.55;
-            let bgW = img.width * scaleFactor;
-            let bgH = img.height * scaleFactor;
-            let bgX = (ctxTarget.canvas.width - bgW) / 2;
-            let bgY = 80;
+            fineScale = Math.min((ctx.canvas.width - 100) / img.width, (ctx.canvas.height - 100) / img.height);
+            fineOffsetX = (ctx.canvas.width - (img.width * fineScale)) / 2;
+            fineOffsetY = (ctx.canvas.height - (img.height * fineScale)) / 2;
 
-            ctxTarget.drawImage(img, bgX, bgY, bgW, bgH);
-            ctxTarget.strokeStyle = '#27272a';
-            ctxTarget.lineWidth = 2;
-            ctxTarget.strokeRect(bgX, bgY, bgW, bgH);
+            ctx.drawImage(img, fineOffsetX, fineOffsetY, img.width * fineScale, img.height * fineScale);
+            
+            ctx.strokeStyle = '#555'; ctx.lineWidth = 2;
+            ctx.strokeRect(fineOffsetX, fineOffsetY, img.width * fineScale, img.height * fineScale);
 
-            item.fineCustomObjects.forEach((obj, idx) => {
-                if (obj.type === 'crop_case') {
-                    ctxTarget.strokeStyle = '#10b981';
-                    ctxTarget.lineWidth = idx === selectedFineObjIndex ? 4 : 2;
-                    ctxTarget.strokeRect(obj.x, obj.y, obj.w, obj.h);
-                    ctxTarget.fillStyle = '#10b981';
-                    ctxTarget.font = '12px sans-serif';
-                    ctxTarget.fillText(obj.label, obj.x, obj.y - 6);
-                } else if (obj.type === 'crop_alg') {
-                    ctxTarget.strokeStyle = '#3b82f6';
-                    ctxTarget.lineWidth = idx === selectedFineObjIndex ? 4 : 2;
-                    ctxTarget.strokeRect(obj.x, obj.y, obj.w, obj.h);
-                    ctxTarget.fillStyle = '#3b82f6';
-                    ctxTarget.font = '12px sans-serif';
-                    ctxTarget.fillText(obj.label, obj.x, obj.y - 6);
-                } else if (obj.type === 'box') {
-                    ctxTarget.strokeStyle = obj.color;
-                    ctxTarget.lineWidth = idx === selectedFineObjIndex ? 4 : 2;
-                    ctxTarget.strokeRect(obj.x, obj.y, obj.w, obj.h);
+            const allObjs = [
+                { obj: item.cropCase, isPrimary: true },
+                { obj: item.cropAlg, isPrimary: true },
+                ...item.extraObjs.map(o => ({ obj: o, isPrimary: false }))
+            ];
+
+            allObjs.forEach(itemWrapper => {
+                const obj = itemWrapper.obj;
+                const cx = fineOffsetX + (obj.x * fineScale);
+                const cy = fineOffsetY + (obj.y * fineScale);
+                const cw = obj.w * fineScale;
+                const ch = obj.h * fineScale;
+                const isSelected = (activeFineObj === obj);
+
+                if (obj.type === 'crop' || obj.type === 'box') {
+                    ctx.strokeStyle = obj.color || '#4CAF50';
+                    ctx.lineWidth = isSelected ? 4 : 2;
+                    ctx.strokeRect(cx, cy, cw, ch);
+                    if(obj.label) {
+                        ctx.fillStyle = obj.color || '#4CAF50'; ctx.font = 'bold 14px Arial'; ctx.textAlign = 'left';
+                        ctx.fillText(obj.label, cx, cy - 8);
+                    }
                 } else if (obj.type === 'text') {
-                    ctxTarget.fillStyle = obj.color || '#000000';
-                    ctxTarget.font = `${obj.fontSize || 22}px sans-serif`;
-                    ctxTarget.textAlign = 'left';
-                    ctxTarget.fillText(obj.text, obj.x, obj.y + 25);
-                    ctxTarget.strokeStyle = idx === selectedFineObjIndex ? '#3b82f6' : '#e4e4e7';
-                    ctxTarget.lineWidth = 1;
-                    ctxTarget.strokeRect(obj.x, obj.y, obj.w, obj.h);
+                    ctx.fillStyle = obj.color || '#f44336';
+                    const fontSz = (obj.fontSize || 24) * fineScale;
+                    ctx.font = `bold ${Math.max(10, fontSz)}px Arial`;
+                    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                    ctx.fillText(obj.text || '', cx, cy);
+                    
+                    ctx.strokeStyle = obj.color || '#f44336';
+                    ctx.lineWidth = isSelected ? 3 : 1;
+                    ctx.strokeRect(cx, cy, cw, ch);
                 }
 
-                if (idx === selectedFineObjIndex) {
-                    const handles = getHandles(obj);
-                    ctxTarget.fillStyle = '#3b82f6';
-                    for (let hKey in handles) {
-                        const h = handles[hKey];
-                        ctxTarget.fillRect(h.x - handleSize/2, h.y - handleSize/2, handleSize, handleSize);
+                if (isSelected) {
+                    const handles = getHandles({x:cx, y:cy, w:cw, h:ch});
+                    ctx.fillStyle = '#fff';
+                    for(let k in handles) {
+                        ctx.fillRect(handles[k].x - handleSize/2, handles[k].y - handleSize/2, handleSize, handleSize);
+                        ctx.strokeRect(handles[k].x - handleSize/2, handles[k].y - handleSize/2, handleSize, handleSize);
                     }
                 }
             });
         }
 
-        function drawFreeformSheet(ctxTarget) {
-            ctxTarget.fillStyle = '#ffffff';
-            ctxTarget.fillRect(0, 0, ctxTarget.canvas.width, ctxTarget.canvas.height);
+        function drawFreeformSheet(ctx) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-            const activeCases = casesData.filter(c => c.enabled);
-            activeCases.forEach((item) => {
-                const realIndex = casesData.indexOf(item);
-                let currentX = item.freeX;
-                let currentY = item.freeY;
-                let currentW = item.freeW;
-                let currentH = item.freeH;
+            casesData.forEach((item, index) => {
+                if(!item.enabled) return;
+                const bx = item.freeBlock.x, by = item.freeBlock.y;
+                const bw = item.freeBlock.w, bh = item.freeBlock.h;
+                const isSel = (index === selectedFreeIndex);
 
-                ctxTarget.fillStyle = '#fafafa';
-                ctxTarget.fillRect(currentX, currentY, currentW, currentH);
-                ctxTarget.strokeStyle = realIndex === selectedFreeIndex ? '#3b82f6' : '#d4d4d8';
-                ctxTarget.lineWidth = realIndex === selectedFreeIndex ? 3 : 2;
-                ctxTarget.strokeRect(currentX, currentY, currentW, currentH);
+                ctx.fillStyle = isSel ? '#f4f9ff' : '#fcfcfc';
+                ctx.fillRect(bx, by, bw, bh);
+                ctx.strokeStyle = isSel ? '#2196F3' : '#ddd';
+                ctx.lineWidth = isSel ? 3 : 1;
+                ctx.strokeRect(bx, by, bw, bh);
 
-                const img = item.img;
-                let displaySize = 80;
-                ctxTarget.drawImage(img, img.width * 0.04, img.height * 0.74, img.width * 0.15, img.height * 0.15, currentX + 10, currentY + 15, displaySize, displaySize);
-                ctxTarget.drawImage(img, 0, 0, img.width, img.height * 0.22, currentX + displaySize + 25, currentY + 25, currentW - displaySize - 40, 55);
+                drawImageAspectFit(ctx, item.img, item.cropCase.x, item.cropCase.y, item.cropCase.w, item.cropCase.h, 
+                            bx + item.layoutCase.x, by + item.layoutCase.y, item.layoutCase.w, item.layoutCase.h);
+                if(isSel) {
+                    ctx.strokeStyle = '#4CAF50'; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+                    ctx.strokeRect(bx + item.layoutCase.x, by + item.layoutCase.y, item.layoutCase.w, item.layoutCase.h);
+                    ctx.setLineDash([]);
+                }
 
-                if (item.fineCustomObjects) {
-                    item.fineCustomObjects.forEach(obj => {
-                        if (obj.type === 'text') {
-                            ctxTarget.fillStyle = obj.color || '#09090b';
-                            ctxTarget.font = `${obj.fontSize || 18}px sans-serif`;
-                            ctxTarget.fillText(obj.text, currentX + 10, currentY - 8);
+                drawImageAspectFit(ctx, item.img, item.cropAlg.x, item.cropAlg.y, item.cropAlg.w, item.cropAlg.h, 
+                            bx + item.layoutAlg.x, by + item.layoutAlg.y, item.layoutAlg.w, item.layoutAlg.h);
+
+                if (item.extraObjs && item.extraObjs.length > 0 && item.cropCase.w > 0 && item.cropCase.h > 0) {
+                    const sw = item.cropCase.w, sh = item.cropCase.h;
+                    const dx = bx + item.layoutCase.x, dy = by + item.layoutCase.y, dw = item.layoutCase.w, dh = item.layoutCase.h;
+                    const srcAspect = sw / sh;
+                    const dstAspect = dw / dh;
+                    let drawW = dw, drawH = dh;
+                    let offsetX = 0, offsetY = 0;
+                    if (srcAspect > dstAspect) {
+                        drawH = dw / srcAspect;
+                        offsetY = (dh - drawH) / 2;
+                    } else {
+                        drawW = dh * srcAspect;
+                        offsetX = (dw - drawW) / 2;
+                    }
+                    const scale = drawW / sw;
+
+                    item.extraObjs.forEach(obj => {
+                        const ox = dx + offsetX + obj.x * scale;
+                        const oy = dy + offsetY + obj.y * scale;
+                        const ow = obj.w * scale;
+                        const oh = obj.h * scale;
+
+                        if (obj.type === 'box') {
+                            ctx.strokeStyle = obj.color || '#ffeb3b';
+                            ctx.lineWidth = 2;
+                            ctx.strokeRect(ox, oy, ow, oh);
+                        } else if (obj.type === 'text') {
+                            ctx.fillStyle = obj.color || '#f44336';
+                            const fontSz = (obj.fontSize || 24) * scale;
+                            ctx.font = `bold ${Math.max(10, fontSz)}px Arial`;
+                            ctx.textAlign = 'left';
+                            ctx.textBaseline = 'top';
+                            ctx.fillText(obj.text || '', ox, oy);
                         }
                     });
                 }
 
-                if (realIndex === selectedFreeIndex) {
-                    const handles = getHandles({ x: currentX, y: currentY, w: currentW, h: currentH });
-                    ctxTarget.fillStyle = '#3b82f6';
-                    for (let hKey in handles) {
-                        const h = handles[hKey];
-                        ctxTarget.fillRect(h.x - handleSize/2, h.y - handleSize/2, handleSize, handleSize);
+                if(isSel) {
+                    ctx.strokeStyle = '#2196F3';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(bx, by, bw, bh);
+
+                    const handles = getHandles(item.freeBlock);
+                    ctx.fillStyle = '#fff';
+                    for(let k in handles) {
+                        ctx.fillRect(handles[k].x - handleSize/2, handles[k].y - handleSize/2, handleSize, handleSize);
+                        ctx.strokeRect(handles[k].x - handleSize/2, handles[k].y - handleSize/2, handleSize, handleSize);
                     }
                 }
             });
         }
 
         function redrawAll() {
-            drawGridSheet(document.getElementById('gridCanvas').getContext('2d'));
-            drawFineSheet(document.getElementById('fineCanvas').getContext('2d'));
-            drawFreeformSheet(document.getElementById('freeCanvas').getContext('2d'));
+            if(document.getElementById('gridPage').classList.contains('active-page')) drawGridSheet(document.getElementById('gridCanvas').getContext('2d'));
+            if(document.getElementById('groupsPage').classList.contains('active-page')) drawGroupsSheet(document.getElementById('groupsCanvas').getContext('2d'));
+            if(document.getElementById('fineTunePage').classList.contains('active-page')) drawFineSheet(document.getElementById('fineCanvas').getContext('2d'));
+            if(document.getElementById('freeformPage').classList.contains('active-page')) drawFreeformSheet(document.getElementById('freeCanvas').getContext('2d'));
         }
 
-        document.getElementById('columnLayout').addEventListener('change', () => { redrawAll(); saveToLocalStorage(); });
-        document.getElementById('sheetTheme').addEventListener('change', () => { redrawAll(); saveToLocalStorage(); });
-        document.getElementById('sheetTitle').addEventListener('input', () => { redrawAll(); saveToLocalStorage(); });
-        document.getElementById('sheetSubtitle').addEventListener('input', () => { redrawAll(); saveToLocalStorage(); });
-
-        // Export JSON Project
-        document.getElementById('exportJsonBtn').addEventListener('click', () => {
-            const dataToExport = {
-                title: document.getElementById('sheetTitle').value,
-                subtitle: document.getElementById('sheetSubtitle').value,
-                columns: document.getElementById('columnLayout').value,
-                theme: document.getElementById('sheetTheme').value,
+        document.getElementById('exportProjectBtn').addEventListener('click', () => {
+            const saveData = {
+                sheetProps,
+                globalLayout,
+                groupsData,
                 cases: casesData.map(c => ({
-                    imgSrc: c.img.src,
                     name: c.name,
                     enabled: c.enabled,
-                    group: c.group,
-                    caseX: c.caseX,
-                    caseY: c.caseY,
-                    caseSize: c.caseSize,
-                    algH: c.algH,
-                    freeX: c.freeX,
-                    freeY: c.freeY,
-                    freeW: c.freeW,
-                    freeH: c.freeH,
-                    fineCustomObjects: c.fineCustomObjects
+                    category: c.category || 'General',
+                    dataUrl: c.dataUrl,
+                    cropCase: c.cropCase,
+                    cropAlg: c.cropAlg,
+                    extraObjs: c.extraObjs,
+                    freeBlock: c.freeBlock,
+                    layoutCase: c.layoutCase,
+                    layoutAlg: c.layoutAlg
                 }))
             };
-            const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+            const blob = new Blob([JSON.stringify(saveData, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'PLL-Sheet-Ultimate-Project.json';
+            a.download = 'PLL-Studio-Pro-Project.json';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            showToast("Project exported successfully as JSON");
         });
 
-        document.getElementById('importJsonBtn').addEventListener('click', () => {
-            document.getElementById('jsonFileInput').click();
+        document.getElementById('importProjectBtn').addEventListener('click', () => {
+            document.getElementById('importFile').click();
         });
 
-        document.getElementById('jsonFileInput').addEventListener('change', (e) => {
+        document.getElementById('importFile').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = (event) => {
                 try {
                     const parsed = JSON.parse(event.target.result);
-                    if (parsed.cases) {
-                        casesData = parsed.cases.map(c => {
+                    if (parsed.sheetProps) sheetProps = { ...sheetProps, ...parsed.sheetProps };
+                    if (parsed.globalLayout) globalLayout = { ...globalLayout, ...parsed.globalLayout };
+                    if (parsed.groupsData && Array.isArray(parsed.groupsData)) groupsData = parsed.groupsData;
+                    
+                    if (parsed.cases && Array.isArray(parsed.cases)) {
+                        casesData = [];
+                        let loadedCount = 0;
+                        parsed.cases.forEach((item, index) => {
                             const img = new Image();
-                            img.src = c.imgSrc;
-                            return { ...c, img };
+                            img.onload = () => {
+                                ensureCaseProperties(item, img, index);
+                                item.img = img;
+                                casesData.push(item);
+                                loadedCount++;
+                                if (loadedCount === parsed.cases.length) {
+                                    if (casesData.length > 0) {
+                                        selectedIndex = 0;
+                                        selectedFreeIndex = 0;
+                                        activeFineObj = casesData[0].cropCase;
+                                    }
+                                    updateThumbnails();
+                                    updateGroupsUI();
+                                    updateFineSlidersBounds();
+                                    saveToLocalStorage();
+                                    redrawAll();
+                                    showToast("Project imported successfully!");
+                                }
+                            };
+                            img.src = item.dataUrl;
                         });
-                        if (parsed.title) document.getElementById('sheetTitle').value = parsed.title;
-                        if (parsed.subtitle) document.getElementById('sheetSubtitle').value = parsed.subtitle;
-                        if (parsed.columns) document.getElementById('columnLayout').value = parsed.columns;
-                        if (parsed.theme) document.getElementById('sheetTheme').value = parsed.theme;
-                        saveState();
-                        updateAllThumbnails();
-                        redrawAll();
-                        saveToLocalStorage();
-                        showModal("Success", "Project imported successfully!");
                     }
                 } catch (err) {
-                    showModal("Error", "Invalid JSON file format.");
+                    console.error("Invalid JSON project file", err);
+                    showToast("Error importing project JSON file.");
                 }
             };
             reader.readAsText(file);
+            e.target.value = '';
         });
 
         document.getElementById('globalDownloadBtn').addEventListener('click', () => {
-            const activePage = document.querySelector('.page-view:not(.hidden)');
+            const activePage = document.querySelector('.page-view.active-page');
             const activeCanvas = activePage.querySelector('canvas');
             activeCanvas.toBlob((blob) => {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'PLL-Sheet-Ultimate-Export.png';
+                a.download = 'PLL-Master-Sheet.png';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-            }, 'image/png');
+                showToast("High-Res PNG sheet exported!");
+            }, 'image/png', 1.0);
         });
 
-        document.getElementById('modalCloseBtn').addEventListener('click', () => {
-            document.getElementById('customModal').classList.add('hidden');
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromLocalStorage();
+            updateGroupsUI();
+            redrawAll();
         });
-
-        // Initialize application on load
-        loadFromLocalStorage();
-        saveState();
-        updateAllThumbnails();
-        redrawAll();
     </script>
 </body>
 </html>
